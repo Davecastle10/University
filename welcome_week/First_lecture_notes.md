@@ -96,4 +96,4 @@ float position = 10.45034;
 int tilePosition = ( int ) position ;
 ```
   
-- You must be carefull when explicitly converting data
+- You must be carefull when explicitly converting data, as it can be easy to cause 
