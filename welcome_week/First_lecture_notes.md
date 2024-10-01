@@ -85,3 +85,15 @@ Will be using JDK 17, but it is installed on the virtual lab, so don't really ne
 - Brackets can be used to make the operations easier to understand, as it can help to split up an equation into more easily manageable chunks
 - This cna be done further, by splitting a complivcated calculation up ovber multiple variables that take place sepratly and then combining the variables together later on to finish the calculation.
 - Brackets take effect first based on whichever bracket is the most innermost, after that the leftmost bracket takes effect first.
+
+#### Type conversions
+  
+- Java perfomrs implicit type conversions if you are doing an operation with multiple data types, e.g. adding a float and an int
+- This is done by converting an answer into a unigfiying type, i.e a type that can hold the answer without losing precision
+- You can also eplicitly convert between types suing the cast operator e.g.  
+``` 
+float position = 10.45034;
+int tilePosition = ( int ) position ;
+```
+  
+- You must be carefull when explicitly converting data

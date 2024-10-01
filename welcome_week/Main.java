@@ -9,6 +9,7 @@ public class Main {
         int answer = 0;
 
         answer = x + y;
+        System.out.println(answer);
     }
 
 }
