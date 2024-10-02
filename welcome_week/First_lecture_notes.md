@@ -23,7 +23,7 @@
 10. streams
 11. revision and good coding practice
 
-## Java
+## Java   
 
 Will be using JDK 17, but it is installed on the virtual lab, so don't really need to worry too much about that.  
 
