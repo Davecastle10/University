@@ -17,3 +17,10 @@
 
 - Practice
 - Learning
+
+
+## Things to do
+
+- Find old CV and make a new/updated version of it
+
+Developing as a computing professional is an unending journey, but you can prepeare for it.  
