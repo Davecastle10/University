@@ -1,3 +1,4 @@
+// I think this is week 1 oop homework
 import java.util.Scanner;
 
 
