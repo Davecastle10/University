@@ -93,7 +93,7 @@ public class Day {
 
         // day of the week
     
-        public String dayOfWeek()
+        public String dayOfWeek()// based on Lewis Carrols day of the week code.
         {
             String result = "unknown";
 
