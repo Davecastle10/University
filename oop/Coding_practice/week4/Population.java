@@ -104,5 +104,25 @@ update
             System.out.println(this.toString());
         }
     }
+
+    public void updateUnitllNoInfected(int time)
+    {
+        // probably need to do a double loop
+        boolean infected = true;
+        int personIndex = 0;
+        int infectedCount = 0;
+        while (infected)
+        {
+            if ( populationArray[personIndex])
+            {
+                infected = true;
+                infectedCount++;
+            }
+            else
+            {
+                infected = false;
+            }
+        }
+    }
 }
 

@@ -32,8 +32,7 @@ public class Week4Work
 
         Population p = new Population(100, 0.1, 0.2, 0.9);
         System.out.println(p);
-        //p.updateOverTimeOutputs(100);
-        //System.out.println(p);
+        p.updateOverTimeOutputs(100);
     }
 
     
