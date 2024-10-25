@@ -1,3 +1,5 @@
+/*
+
 package week3.quiz1;
 
 import java.util.Scanner;
@@ -12,3 +14,5 @@ public class WorkingsOut {
 
     }
 }
+
+*/
