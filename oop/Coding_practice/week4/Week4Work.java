@@ -30,9 +30,14 @@ public class Week4Work
         System.out.println(count);
         */
 
-        Population p = new Population(100, 0.1, 0.2, 0.9);
-        System.out.println(p);
-        p.updateOverTimeOutputs(100);
+        //Population p = new Population(100, 0.1, 0.2005, 0.2);
+        //System.out.println(p.updateUnitllNoInfected(200));
+        //System.out.println(p.averageUpdateUntilNoInfected(100, 200));
+        //p.updateOverTimeOutputs(100);
+
+        Challenge4 intInputTest = new Challenge4(3549);
+
+        System.out.println(intInputTest.toString());
     }
 
     

@@ -88,6 +88,22 @@ update
 
     }
 
+    public boolean areThereInfected()
+    {
+        boolean anyInfected = false;
+        int count = 0;
+        while (anyInfected != true && count < populationSize)
+        {
+            if (populationArray[count] == true)
+            {
+                anyInfected = true;
+            }
+             count++;
+        }
+
+        return anyInfected;
+    }
+
     public void updateOverTime(int time)
     {
         for (int i = 0; i < time; i++)
@@ -105,14 +121,16 @@ update
         }
     }
 
-    public void updateUnitllNoInfected(int time)
+    public int updateUnitllNoInfected(int time)
     {
         // probably need to do a double loop
-        boolean infected = true;
-        int personIndex = 0;
-        int infectedCount = 0;
-        while (infected)
+        //boolean infected = true;
+        //int personIndex = 0;
+        //int infectedCount = 0;
+        int runCount = 0;
+        while (this.areThereInfected() != false && runCount < time)
         {
+            /* 
             if ( populationArray[personIndex])
             {
                 infected = true;
@@ -121,8 +139,31 @@ update
             else
             {
                 infected = false;
-            }
+            }*/
+
+            runCount++;
+            this.update();
         }
+
+        return runCount;
+    }
+
+    public int averageUpdateUntilNoInfected(int amountOfRuns, int individualRunTime)
+    {
+        int runTotals = 0;
+        int average;
+        for (int i = 0; i < amountOfRuns; i ++)
+        {
+            int currentRun = this.updateUnitllNoInfected(individualRunTime);// something is wrong here 
+
+            runTotals = runTotals + currentRun;
+            //System.out.println(currentRun);
+
+        }
+
+        average = runTotals / amountOfRuns;
+
+        return average;
     }
 }
 
