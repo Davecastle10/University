@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Challenge4 {
     int numberInt;
     String numberString = "";
+    int numberOfSymbolsAvailable = 12;// there are 12 symbols in use at the momemnt
     int numbers[] = {1,4,5,9,10,40,50,90,100,400,500,900,1000};// 12 values
     String symbols[] = {"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
     
@@ -14,8 +15,24 @@ public class Challenge4 {
         this.numberInt = numberInt;
         int tempNumberInt = numberInt;
 
+        // using a nested loop
+        for (int i = numberOfSymbolsAvailable; i >= 0; i--)
+        {
+            int quotient = tempNumberInt / numbers[i];// how many 1000's are in the number
+
+            while (tempNumberInt >= numbers[i])
+            {
+                numberString += symbols[i];
+                tempNumberInt -= numbers[i];
+            }
+
+            tempNumberInt = tempNumberInt % numbers[i];
+        }
+
+        /* using 1 loop with a stack of if else statements.
         while (tempNumberInt > 0)
         {
+
             if (tempNumberInt >= numbers[12])// numbers[12] is 1000
             {
                 int quotient = tempNumberInt / numbers[12];// how many 1000's are in the number
@@ -148,12 +165,25 @@ public class Challenge4 {
 
 
         }
+        */
 
-    }
+    } 
 
+
+    // using nested loops
     public Challenge4 (String numberString)// string input constructor
     {
         this.numberString = numberString;
+        String tempString = numberString;
+        
+        for (int i = numberOfSymbolsAvailable; i >= 0; i--)
+        {
+            while (tempString.startsWith(symbols[i]))
+            {
+                numberInt += numbers[i];
+                tempString = tempString.substring(symbols[i].length());
+            }
+        }
     }
     
 

@@ -35,9 +35,12 @@ public class Week4Work
         //System.out.println(p.averageUpdateUntilNoInfected(100, 200));
         //p.updateOverTimeOutputs(100);
 
-        Challenge4 intInputTest = new Challenge4(3549);
+        Challenge4 intInputTest = new Challenge4(3459);
+        Challenge4 StringInputTest = new Challenge4("MMMCDLIX");
+        
 
         System.out.println(intInputTest.toString());
+        System.out.println(StringInputTest.getArabicNumeras());
     }
 
     
