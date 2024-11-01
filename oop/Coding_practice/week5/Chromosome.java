@@ -66,8 +66,13 @@ public class Chromosome {
     public Chromosome copy()
     {
         Chromosome copyChromosome = new Chromosome(size, generator);
+        for (int i = 0; i < size; i++)
+        {
+        copyChromosome.gene[i] = this.gene[i];
+        }
         return copyChromosome;
     }
+
 
     public int fitness()
     {
@@ -83,5 +88,21 @@ public class Chromosome {
 
         return count;
     }
-    
+
+    public int comparison(Chromosome comparedChromosome)
+    {
+        if (this.fitness() > comparedChromosome.fitness())
+        {
+            return 1;// this has better fitness than the other
+        }
+        else if (this.fitness() == comparedChromosome.fitness())
+        {
+            return 0;// they have equal fitness
+        }
+        else
+        {
+            return -1;// this has worse fitness than the other
+        }
+    }
+
 }
