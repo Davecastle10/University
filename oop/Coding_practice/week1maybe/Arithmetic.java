@@ -1,3 +1,4 @@
+package week1maybe;
 import java.util.Scanner;// the java modulue?? that is used for taking inputs from the terminal/command line
 
 public class Arithmetic
