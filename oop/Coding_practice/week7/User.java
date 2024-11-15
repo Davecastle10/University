@@ -14,11 +14,11 @@ public class User implements Subscriber
 
     public void post(String news)
     {
-        board.setNews(news);
+        board.setNews(">>>" + news);
     }
 
     public void alert()
     {
-        System.out.println("Alert recieved by " + name);
+        System.out.println("!! Alert recieved by " + name + " !!");
     }
 }

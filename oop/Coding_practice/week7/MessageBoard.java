@@ -17,10 +17,12 @@ public class MessageBoard
     {
         this.news = news;
 
+        System.out.println("");
         for (Subscriber m: members)
         {
             m.alert();
         }
+        System.out.println("");
     }
 
     public String getNews()

@@ -14,6 +14,6 @@ public class Reader implements Subscriber
 
     public void alert()
     {
-        System.out.println("Alert recieved by " + id);
+        System.out.println("!! Alert recieved by " + id + " !!");
     }
 }
