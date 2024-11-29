@@ -11,6 +11,14 @@ public class Ancestors
         pop.initial();
         pop.display();
         
+
+        System.out.println("");
+        Population previous = pop.generation();
+        previous.display();
+        System.out.println(previous.max());
+
+        Population recent = pop.mostRecent();
+        recent.display();
     }
     
 

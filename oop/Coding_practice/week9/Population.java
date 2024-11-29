@@ -33,6 +33,48 @@ public class Population
         }
     }
 
+    public Population generation()
+    {
+        Population prevPop = new Population(10, generator); 
+        for (int i = 0; i < size; i++)
+        {
+            int mother = generator.nextInt(size);
+            int father = generator.nextInt(size);
+
+            prevPop.pop.get(mother).addAll(this.pop.get(i));
+            prevPop.pop.get(father).addAll(this.pop.get(i));
+        }
+
+        return prevPop;
+    }
+
+    public int max()
+    {
+        int maxPop = 0;
+        for (int i = 0; i < size; i++)
+        {
+            int s = this.pop.get(i).size();
+            if ( s > maxPop)
+            {
+                maxPop = s;
+            }
+        }
+
+        return maxPop;
+    }
+
+    public Population mostRecent()
+    {
+        if (this.max() == size)
+        {
+            return this;
+        }
+        else
+        {
+            return this.generation().mostRecent();
+        }
+    }
+
     public void display()
     {
         for (int i = 0; i < size; i++)
