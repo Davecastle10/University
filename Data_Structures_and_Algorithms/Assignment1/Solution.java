@@ -58,6 +58,23 @@ public class Solution {
 
         else
         {
+            int midRow = (startRow + endRow) / 2;// index of the middle row of the matrix
+            int topStartCol = maxIndex(matrix[startRow], startCol, endCol);//find index of max item in top coloum
+            int midStartCol = maxIndex(matrix[midRow], startCol, endCol);//find index of max item in middle column
+
+            int topMaxValue = Math.max(matrix[startRow][topStartCol], blockMaxValue(matrix, startRow + 1, topStartCol, midRow, endCol));// max value of top half found from max value of top row, and max value found recursively of the top half minus the top row inculding middle row
+            //int bottomMaxValue = Math.max(matrix[midRow + 1][midStartCol], blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol));
+            int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol);// max value of the bottom half of the matrix
+
+            return Math.max(topMaxValue, bottomMaxValue);
+            // not finished yet, need to implement the column aspect???
+            // kinda have column stuff, but don't think it is actually decreasing time complexity much if anything might be increasing it by accident.
+        }
+
+        /* 
+
+        else
+        {
             // this is O(nxm) which is bad, hwo to implement divide and conquer?
             int maxRowValue = matrix[startRow][startCol];//max val in row, set to first val of first row for inital val
             int maxMatrixValue = maxRowValue;// max val in matrix, set to first val of first row for inital val 
@@ -65,12 +82,14 @@ public class Solution {
             for (int i = startRow +1; i <= endRow; i++ )
             {
                 for (int j = columnIndex; j <= endCol; j++)
+                {
+                    
                     if(maxRowValue < matrix[i][j])
                     {
                         maxRowValue = matrix[i][j];
                         columnIndex = j;
                     }
-                
+                }
                 if (maxMatrixValue < maxRowValue)
                 {
                     maxMatrixValue = maxRowValue;
@@ -81,12 +100,14 @@ public class Solution {
 
         }
 
-        //return -1000;
+        */
     }
 
     public static int matrixMaxValue(int[][] matrix) {
         // Returns the maximum entry in the matrix between columns startCol, endCol inclusive and between rows startRow, endRow inclusive
-        return -1000;
+        
+        return blockMaxValue(matrix, 0, 0, matrix.length -1, matrix[0].length -1);
+        //return -1000;
     }
 
     
