@@ -58,17 +58,36 @@ public class Solution {
 
         else
         {
-            int midRow = (startRow + endRow) / 2;// index of the middle row of the matrix
-            int topStartCol = maxIndex(matrix[startRow], startCol, endCol);//find index of max item in top coloum
-            int midStartCol = maxIndex(matrix[midRow], startCol, endCol);//find index of max item in middle column
+            // calculations for these done in if for better time complexity so that mid row index and mid col max not done if matrix only has two rows
+            int midRow;// index of the middle row of the matrix
+            int topStartCol;//find index of max item in top row
+            int midStartCol;//find index of max item in middle row from max item from start row to end column
+            int bottomEndCol;//find max item item in end row from max item in mid row to end col
 
-            int topMaxValue = Math.max(matrix[startRow][topStartCol], blockMaxValue(matrix, startRow + 1, topStartCol, midRow, endCol));// max value of top half found from max value of top row, and max value found recursively of the top half minus the top row inculding middle row
+            if (matrix.length == 2)// if only two coloumns, is more efficient to do this iff than two find max value in middle column
+            {   
+                topStartCol = maxIndex(matrix[startRow], startCol, endCol);//find index of max item in top row
+                bottomEndCol = maxIndex(matrix[endRow], topStartCol, endCol);//find max item item in end row from max item in mid row to end col
+                midRow = startRow;// if only two rows make mid row equal to top/start row so base case is used
+                midStartCol = bottomEndCol;// if only two rows make mid start col = to end row col
+            }
+            else
+            {
+                midRow = (startRow + endRow) / 2;// index of the middle row of the matrix
+                topStartCol = maxIndex(matrix[startRow], startCol, endCol);//find index of max item in top row
+                midStartCol = maxIndex(matrix[midRow], topStartCol, endCol);//find index of max item in middle row from max item from start row to end column
+                bottomEndCol = maxIndex(matrix[endRow], midStartCol, endCol);//find max item item in end row from max item in mid row to end col
+            }
+            
+            int topMaxValue = Math.max(matrix[startRow][topStartCol], blockMaxValue(matrix, startRow + 1, topStartCol, midRow, midStartCol));// max value of top half found from max value of top row, and max value found recursively of the top half minus the top row inculding middle row
             //int bottomMaxValue = Math.max(matrix[midRow + 1][midStartCol], blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol));
-            int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol);// max value of the bottom half of the matrix
+            int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, bottomEndCol);// max value of the bottom half of the matrix
 
             return Math.max(topMaxValue, bottomMaxValue);
             // not finished yet, need to implement the column aspect???
             // kinda have column stuff, but don't think it is actually decreasing time complexity much if anything might be increasing it by accident.
+            //think time complexity is now done to O(m*log(n)) now as it searches recursively well through the rows
+            //space complexity will be O(log(n)) as it is recursive and splits the the matrix in half with each call until matrix is just 1d array
         }
 
         /* 
