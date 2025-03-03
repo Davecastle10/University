@@ -31,7 +31,7 @@ public class Solution {
             return matrix[startRow][startCol];
         }
 
-        else if (startRow == endRow)
+        else if (startRow == endRow)// base case for recursion and for when matrix is only a single row with m columns 
         {
             
             int[] row = matrix[startRow];
@@ -39,18 +39,15 @@ public class Solution {
             return row[index];
         }
 
-        else if (startCol == endCol)
+        else if (startCol == endCol)// for when matrix is a single column with n rows
         {
-            //return matrix[startRow][startCol];
             int value = matrix[startRow][startCol];
-            //int valueIndex = startRow;
             
             for (int i = startRow +1; i <= endRow; i++ )
             {
                 if(value < matrix[i][startCol])
                 {
                     value = matrix[i][startCol];
-                    //valueIndex = i;
                 }
             }
             return value;
@@ -69,7 +66,7 @@ public class Solution {
                 topStartCol = maxIndex(matrix[startRow], startCol, endCol);//find index of max item in top row
                 bottomEndCol = maxIndex(matrix[endRow], topStartCol, endCol);//find max item item in end row from max item in mid row to end col
                 midRow = startRow;// if only two rows make mid row equal to top/start row so base case is used
-                midStartCol = bottomEndCol;// if only two rows make mid start col = to end row col
+                midStartCol = bottomEndCol;// if only two rows make mid start col = to end row max col
             }
             else
             {
@@ -80,53 +77,18 @@ public class Solution {
             }
             
             int topMaxValue = Math.max(matrix[startRow][topStartCol], blockMaxValue(matrix, startRow + 1, topStartCol, midRow, midStartCol));// max value of top half found from max value of top row, and max value found recursively of the top half minus the top row inculding middle row
-            //int bottomMaxValue = Math.max(matrix[midRow + 1][midStartCol], blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol));
             int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, bottomEndCol);// max value of the bottom half of the matrix
 
             return Math.max(topMaxValue, bottomMaxValue);
-            // not finished yet, need to implement the column aspect???
-            // kinda have column stuff, but don't think it is actually decreasing time complexity much if anything might be increasing it by accident.
             //think time complexity is now done to O(m*log(n)) now as it searches recursively well through the rows
             //space complexity will be O(log(n)) as it is recursive and splits the the matrix in half with each call until matrix is just 1d array
         }
-
-        /* 
-
-        else
-        {
-            // this is O(nxm) which is bad, hwo to implement divide and conquer?
-            int maxRowValue = matrix[startRow][startCol];//max val in row, set to first val of first row for inital val
-            int maxMatrixValue = maxRowValue;// max val in matrix, set to first val of first row for inital val 
-            int columnIndex = startCol;
-            for (int i = startRow +1; i <= endRow; i++ )
-            {
-                for (int j = columnIndex; j <= endCol; j++)
-                {
-                    
-                    if(maxRowValue < matrix[i][j])
-                    {
-                        maxRowValue = matrix[i][j];
-                        columnIndex = j;
-                    }
-                }
-                if (maxMatrixValue < maxRowValue)
-                {
-                    maxMatrixValue = maxRowValue;
-                }
-                
-            }
-            return maxMatrixValue;
-
-        }
-
-        */
     }
 
     public static int matrixMaxValue(int[][] matrix) {
         // Returns the maximum entry in the matrix between columns startCol, endCol inclusive and between rows startRow, endRow inclusive
         
-        return blockMaxValue(matrix, 0, 0, matrix.length -1, matrix[0].length -1);
-        //return -1000;
+        return blockMaxValue(matrix, 0, 0, matrix.length -1, matrix[0].length -1);//call previous function on the whole matrix
     }
 
     
