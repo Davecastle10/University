@@ -1,3 +1,9 @@
+// Data Structures and ALgorithms Assignment 1 code submission
+// D R Jones - 2736390
+
+
+
+
 public class Solution {
     
     public static int maxIndex(int[] row, int start, int end) {
@@ -17,8 +23,6 @@ public class Solution {
 
         /*  space complexity adds two variables so constant
             time complexity searches through all of a row in the area with maximimum possible iterations m with 4 operations per incerment so time O(4m) so O(m)
-            might be wrong but think those are correct
-         * 
          */
 
     }
@@ -26,7 +30,7 @@ public class Solution {
     public static int blockMaxValue(int[][] matrix, int startRow, int startCol, int endRow, int endCol) {
         // Returns the maximum value in the matrix
 
-        if (startCol == endCol && startRow == endRow)
+        if (startCol == endCol && startRow == endRow)// base case for single item matrix
         {
             return matrix[startRow][startCol];
         }
@@ -39,7 +43,7 @@ public class Solution {
             return row[index];
         }
 
-        else if (startCol == endCol)// for when matrix is a single column with n rows
+        else if (startCol == endCol)// for when matrix is a single column with n rows, has complexity O(n) as it searches thorugh the n rows in the matrix
         {
             int value = matrix[startRow][startCol];
             
@@ -63,13 +67,12 @@ public class Solution {
             if (matrix.length == 2)// if only two coloumns, is more efficient to do this iff than two find max value in middle column
             {
                 midRow = startRow;// if only two rows make mid row equal to top/start row so base case is used
-                midStartCol = maxIndex(matrix[endRow], startCol, endCol);// if only two rows make mid start col = to end row max col
             }
             else
             {
                 midRow = (startRow + endRow) / 2;// index of the middle row of the matrix
-                midStartCol = maxIndex(matrix[midRow], startCol, endCol);//find index of max item in middle row 
             }
+            midStartCol = maxIndex(matrix[midRow], startCol, endCol);//find index of max item in middle row 
             
             int topMaxValue =  blockMaxValue(matrix, startRow, startCol, midRow, midStartCol);// max value of top half of the matrix
             int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol);// max value of the bottom half of the matrix
