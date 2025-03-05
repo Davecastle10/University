@@ -37,10 +37,9 @@ public class Solution {
 
         else if (startRow == endRow)// base case for recursion and for when matrix is only a single row with m columns 
         {
-            
-            int[] row = matrix[startRow];
-            int index = maxIndex(row, startCol, endCol);
-            return row[index];
+            // index commented out as it can be run in place for gretaer efficiency
+            //int indexMaxItem = maxIndex(matrix[startRow], startCol, endCol);
+            return matrix[startRow][maxIndex(matrix[startRow], startCol, endCol)];
         }
 
         else if (startCol == endCol)// for when matrix is a single column with n rows, has complexity O(n) as it searches thorugh the n rows in the matrix
@@ -74,10 +73,12 @@ public class Solution {
             }
             midStartCol = maxIndex(matrix[midRow], startCol, endCol);//find index of max item in middle row 
             
-            int topMaxValue =  blockMaxValue(matrix, startRow, startCol, midRow, midStartCol);// max value of top half of the matrix
-            int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol);// max value of the bottom half of the matrix
+            //int topMaxValue =  blockMaxValue(matrix, startRow, startCol, midRow, midStartCol);// max value of top half of the matrix
+            //int bottomMaxValue = blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol);// max value of the bottom half of the matrix
 
-            return Math.max(topMaxValue, bottomMaxValue);
+            // returns the maximum of the maximum of the top and bottom halves of the matrix, changed to all in one line to reduce number of variable assignments which will increase complexity over the run-time fo the function as each assignment would repeat for every recursive call.
+            return Math.max(blockMaxValue(matrix, startRow, startCol, midRow, midStartCol), blockMaxValue(matrix, midRow + 1, midStartCol, endRow, endCol));
+            
             //think time complexity is now done to O(m*log(n)) now as it searches recursively well through the rows
             //space complexity will be O(log(n)) as it is recursive and splits the the matrix in half with each call until matrix is just 1d array
         }

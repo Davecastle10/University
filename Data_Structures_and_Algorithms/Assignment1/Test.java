@@ -79,6 +79,11 @@ public class Test {
             int output = 2;
             testMatrixMaxValue(matrix, output);
         }
+        {
+            int[][] matrix = {{1, -1, -2, -4}, {-1, -3, -2, -5}, {1, 10, -2, -1}, {1, 2, -2, -1}};
+            int output = 10;
+            testMatrixMaxValue(matrix, output);
+        }
     }
     
     public static void main(String[] args) {
