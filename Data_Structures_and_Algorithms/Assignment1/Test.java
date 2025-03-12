@@ -82,6 +82,7 @@ public class Test {
         {
             int[][] matrix = {{1, -1, -2, -4}, {-1, -3, -2, -5}, {1, 10, -2, -1}, {1, 2, -2, -1}};
             int output = 10;
+            System.out.println("fuck you");
             testMatrixMaxValue(matrix, output);
         }
     }
