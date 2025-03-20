@@ -23,20 +23,43 @@ public class Solution {
 
     // Question 1b
     public static int distance1(String x, String y) {
-
+        // consider looping through and performing operations on it unti you get y from x, but this migth nto be the best case complexity
+        // consider coding simillar but easier problems to ease into this one.
+        // 01 - 10 , 10 - 01
+        int numSwaps = 0;
+        char temp = 0;
         if (!reachable1(x, y))
         {
             return -1;
         }
-        int numDifferences = 0;
+
+        char[] xArray = x.toCharArray();
+        //char[] yArray = y.toCharArray();
+
         for (int i = 0; i < x.length(); i++)
         {
             if (x.charAt(i) == y.charAt(i))
             {
-                numDifferences +=  1;
+            }
+            else if (x.charAt(i) != y.charAt(i))
+            {
+                temp = xArray[i];
+                swapLoop : for (int j = i + 1; j < x.length(); j++)
+                {
+                    if (xArray[j] == y.charAt(i))
+                    {
+                        //x = x.substring(0, i) + x.charAt(j) + x.substring(i + 1, j) + temp  + x.substring(j + 1);
+                        xArray[i] = xArray[j];
+                        xArray[j] = temp;
+                       
+                        numSwaps += j - i;
+                        break swapLoop;
+                        
+                    }
+                }
             }
         }
-        return numDifferences;
+        return numSwaps;
     }
 
     // Question 2
