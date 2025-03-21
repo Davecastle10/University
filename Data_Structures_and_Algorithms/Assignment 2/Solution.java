@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Solution {
     // instance avriabkles for q2
@@ -6,6 +8,9 @@ public class Solution {
     static ArrayList[][] graph = new ArrayList[50][2];// for the graph that the string permutations are made to be placed in.
     // not sure if arraylist approach will work as it most likely wont allow fo rme to have the string value followed by an arraylsit of shildren.
     // might have to use regular lsit or some other shenanigans to get round this.
+
+    static Queue<String> queue = new LinkedList<>();// the queue to maintian order of permutaion for the searching of the string
+
 
 
 
@@ -97,6 +102,10 @@ public class Solution {
 
         */
 
+        /* need to decide ont he structure of my graph,
+           do i go for arraylist[ list[[string] [arraylist(string) to contain children]] ]  
+        */
+
         char[] xArray = x.toCharArray();
         String newX = "";
         //char[] yArray = y.toCharArray(); 
@@ -134,27 +143,32 @@ public class Solution {
                 // add something here for if none of the above happen
             }
 
-            if (inGraph(newX))// add as a child for x
+            int newXIndex = inGraph(newX);
+            int xIndex = inGraph(x);
+            if (newXIndex != -1)// add as a child for x
             {
                 
+                //graph[xIndex]. add to the graph somehow
             }
             else// add newX to the graph and give it an arraylist/list thingy that its children can be referenced in in the future.
+            // also add newX to the queue so it will eventually get searched through
             {
-
+                queue.add(newX);
             }
         }
         return -1000000;
     }
 
-    public static boolean inGraph(String x)
+    public static int inGraph(String x)
     {
-        for (int i = 0; i < graph.length(); i++)
+        for (int i = 0; i < graph.length; i++)
         {
             if (graph[i].equals(x))
             {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
+
 }
