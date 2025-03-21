@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 public class Solution {
     // instance avriabkles for q2
-    ArrayList[][] graph = new ArrayList[50][50];// for the graph that the string permutations are made to be placed in.
+    // not sure if this being static is good or nto but other stuf wouldnt work if it wasn't
+    static ArrayList[][] graph = new ArrayList[50][50];// for the graph that the string permutations are made to be placed in.
 
 
 
@@ -95,6 +96,7 @@ public class Solution {
         */
 
         char[] xArray = x.toCharArray();
+        String newX = "";
         //char[] yArray = y.toCharArray(); 
         if (x.equals(y))
         {
@@ -109,20 +111,44 @@ public class Solution {
                 xArray[i] = '0';
                 xArray[i + 1] = '0';
                 xArray[i + 2] = '1';
+                newX = xArray.toString();
             }
             else if (x.substring(i, i + 3) == "011")
             {
                 xArray[i] = '1';
                 xArray[i + 1] = '0';
                 xArray[i + 2] = '0';
+                newX = xArray.toString();
             }
             else if (x.substring(i, i + 3) == "101")
             {
                 xArray[i] = '1';
                 xArray[i + 1] = '1';
                 xArray[i + 2] = '0';
+                newX = xArray.toString();
+            }
+            else
+            {
+                // add something here for if none of the above happen
+            }
+
+            if (inGraph(newX))
+            {
+                
             }
         }
         return -1000000;
+    }
+
+    public static boolean inGraph(String x)
+    {
+        for (int i = 0; i < graph.length(); i++)
+        {
+            if (graph[i].equals(x))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
