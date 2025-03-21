@@ -3,7 +3,9 @@ import java.util.ArrayList;
 public class Solution {
     // instance avriabkles for q2
     // not sure if this being static is good or nto but other stuf wouldnt work if it wasn't
-    static ArrayList[][] graph = new ArrayList[50][50];// for the graph that the string permutations are made to be placed in.
+    static ArrayList[][] graph = new ArrayList[50][2];// for the graph that the string permutations are made to be placed in.
+    // not sure if arraylist approach will work as it most likely wont allow fo rme to have the string value followed by an arraylsit of shildren.
+    // might have to use regular lsit or some other shenanigans to get round this.
 
 
 
@@ -132,9 +134,13 @@ public class Solution {
                 // add something here for if none of the above happen
             }
 
-            if (inGraph(newX))
+            if (inGraph(newX))// add as a child for x
             {
                 
+            }
+            else// add newX to the graph and give it an arraylist/list thingy that its children can be referenced in in the future.
+            {
+
             }
         }
         return -1000000;
