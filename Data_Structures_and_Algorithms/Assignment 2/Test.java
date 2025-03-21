@@ -121,10 +121,10 @@ public class Test {
 
         System.out.println("Testing Q1 b\n");
         numPassed = testCasesDistance1();
-        System.out.println("Q2: " + numPassed + " tests passed\n\n\n");
+        System.out.println("Q1b: " + numPassed + " tests passed\n\n\n");
 
         System.out.println("Testing Q2\n");
         numPassed = testCasesDistance2();
-        System.out.println("Q3: " + numPassed + " tests passed\n\n\n");
+        System.out.println("Q2: " + numPassed + " tests passed\n\n\n");
     }
 }
