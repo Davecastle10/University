@@ -38,21 +38,30 @@ public class Solution {
 
         for (int i = 0; i < x.length(); i++)
         {
+            /* 
             if (x.charAt(i) == y.charAt(i))
             {
             }
-            else if (x.charAt(i) != y.charAt(i))
+            */
+            if (xArray[i] != y.charAt(i))
             {
                 temp = xArray[i];
                 swapLoop : for (int j = i + 1; j < x.length(); j++)
                 {
+                    //numSwaps += 1;
                     if (xArray[j] == y.charAt(i))
                     {
                         //x = x.substring(0, i) + x.charAt(j) + x.substring(i + 1, j) + temp  + x.substring(j + 1);
+                        //System.out.println(xArray);
                         xArray[i] = xArray[j];
                         xArray[j] = temp;
+                        //System.out.println(xArray);
+                        //System.out.println(numSwaps);
+
+                        numSwaps += j-i;
+                        //System.out.println(numSwaps);
                        
-                        numSwaps += j - i;
+                        
                         break swapLoop;
                         
                     }
