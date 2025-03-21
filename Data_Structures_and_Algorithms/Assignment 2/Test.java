@@ -117,7 +117,7 @@ public class Test {
 
         System.out.println("Testing Q1 a\n");
         numPassed = testCasesReachable1();
-        System.out.println("Q1: " + numPassed + " tests passed\n\n\n");
+        System.out.println("Q1a: " + numPassed + " tests passed\n\n\n");
 
         System.out.println("Testing Q1 b\n");
         numPassed = testCasesDistance1();
