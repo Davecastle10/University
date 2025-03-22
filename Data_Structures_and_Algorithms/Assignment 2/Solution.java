@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Solution {
     // instance avriabkles for q2
     // not sure if this being static is good or nto but other stuf wouldnt work if it wasn't
-    static ArrayList[][] graph = new ArrayList[50][2];// for the graph that the string permutations are made to be placed in.
+    static List<List<String>> graph = new ArrayList<>();// for the graph that the string permutations are made to be placed in.
     // not sure if arraylist approach will work as it most likely wont allow fo rme to have the string value followed by an arraylsit of shildren.
     // might have to use regular lsit or some other shenanigans to get round this.
 
@@ -106,37 +107,55 @@ public class Solution {
            do i go for arraylist[ list[[string] [arraylist(string) to contain children]] ]  
         */
 
-        char[] xArray = x.toCharArray();
-        String newX = "";
+        List<String> originalXList = new ArrayList<>();// new list
+        originalXList.add(x);// add x to the new list
+        graph.add(originalXList);// add the new list to the graph
+        queue.add(x);
+
+
+        //char[] xArray = x.toCharArray();
+        //String newX = "";
+
         //char[] yArray = y.toCharArray(); 
-        if (x.equals(y))
-        {
-            return 0;// change this to have it be the case where it starts the shrotest path search over the array
-        }
+        
         for (int i = 0; i < x.length() -3; i++)
         {
+            System.out.println("Q2 strings");
+            System.out.println(queue.peek());
+            String currentX = queue.poll();
+            System.out.println(currentX);
+            char[] xArray = currentX.toCharArray();
+            String newX = "";
+
+            if (currentX.equals(y))
+            {
+                return 0;// change this to have it be the case where it starts the shrotest path search over the array
+            }
+
+
             // add code to swap the 3 char substring for its permutaion - think this nwo done
             // add permutation as a child of current/old string on graph array, and permutaion as new node if ti doesnt alreay exist
-            if (x.substring(i, i + 3) == "110")
+            //System.out.println(currentX.substring(i, i + 3));
+            if (currentX.substring(i, i + 3).equals("110"))
             {
                 xArray[i] = '0';
                 xArray[i + 1] = '0';
                 xArray[i + 2] = '1';
-                newX = xArray.toString();
+                newX = new String(xArray);
             }
-            else if (x.substring(i, i + 3) == "011")
+            else if (currentX.substring(i, i + 3).equals("011"))
             {
                 xArray[i] = '1';
                 xArray[i + 1] = '0';
                 xArray[i + 2] = '0';
-                newX = xArray.toString();
+                newX = new String(xArray);
             }
-            else if (x.substring(i, i + 3) == "101")
+            else if (currentX.substring(i, i + 3).equals("101"))
             {
                 xArray[i] = '1';
                 xArray[i + 1] = '1';
                 xArray[i + 2] = '0';
-                newX = xArray.toString();
+                newX = new String(xArray);
             }
             else
             {
@@ -144,16 +163,21 @@ public class Solution {
             }
 
             int newXIndex = inGraph(newX);
-            int xIndex = inGraph(x);
-            if (newXIndex != -1)// add as a child for x
+            int xIndex = inGraph(currentX);
+            if (newXIndex != -1 && xIndex != -1)// add as a child for x if it already exists in the graph
             {
+                graph.get(xIndex).add(newX);
                 
                 //graph[xIndex]. add to the graph somehow
             }
-            else// add newX to the graph and give it an arraylist/list thingy that its children can be referenced in in the future.
-            // also add newX to the queue so it will eventually get searched through
+            else if (xIndex != -1)// add newX to the graph and give it an arraylist/list thingy that its children can be referenced in in the future. also add newX to the queue so it will eventually get searched through
             {
-                queue.add(newX);
+                //System.out.println(newX);
+                queue.add(newX);// add the string for the new permuataton to the queue
+                graph.get(xIndex).add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
+                List<String> newList = new ArrayList<>();// new list
+                newList.add(newX);// add new string permutaion to the new list
+                graph.add(newList);// add the new list to the graph
             }
         }
         return -1000000;
@@ -161,14 +185,23 @@ public class Solution {
 
     public static int inGraph(String x)
     {
-        for (int i = 0; i < graph.length; i++)
+        for (int i = 0; i < graph.size(); i++)
         {
-            if (graph[i].equals(x))
+            if (graph.get(i).get(0).equals(x))
             {
                 return i;
             }
         }
         return -1;
+    }
+
+    public static int bfs(String x, String y)
+    {
+        Queue<String> nodeQueue = new LinkedList<>();
+        List<List<String>> visited = new ArrayList<>();
+        List<List<String>> unvisited = new ArrayList<>();
+        unvisited = graph;
+
     }
 
 }
