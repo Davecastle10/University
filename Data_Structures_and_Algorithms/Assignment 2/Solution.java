@@ -146,14 +146,17 @@ public class Solution {
             and we do not need to run an additional bfs algorithm, considering the current code is already kinda bfs inspired.
             */
 
+            // moved these 3 lines outside of the for loop in hopes of preventing early termination
+            List<String> currentXNode = queue.poll();
+            String currentXString = currentXNode.get(0);
+            int currentOperationsCount = Integer.parseInt(currentXNode.get(1));
+
             for (int i = 0; i < x.length() -2; i++)// changed back to -2 realised i was pottentially missing last index
             {
                 System.out.println("Q2 strings");
                 System.out.println(queue.peek());
 
-                List<String> currentXNode = queue.poll();
-                String currentXString = currentXNode.get(0);
-                int currentOperationsCount = Integer.parseInt(currentXNode.get(1));
+                
 
                 //String currentX = qu.get(0);
 
@@ -202,9 +205,9 @@ public class Solution {
 
                 // if newX has not already been visited and an operation was applied to create a newX
                 // code to check the value
-                System.out.println("check val before visited and queue addition");
-                System.out.println(newX.get(0));
-                System.out.println(inGraph(newX.get(0), visited));
+                //System.out.println("check val before visited and queue addition");
+                //System.out.println(newX.get(0));
+                //System.out.println(inGraph(newX.get(0), visited));
                 if (newX != null && inGraph(newX.get(0), visited) == -1)
                 {
                     // if newX's string value == y

@@ -4,7 +4,7 @@ import java.util.Arrays;
 public class Test {
     
     static boolean testReachable1(String x, String y, boolean output) {
-        boolean result = SolutionOriginal.reachable1(x, y);
+        boolean result = Solution.reachable1(x, y);
         if(result != output) {
             System.out.println("\tTest failed. Expected " + output + ", got " + result);
             System.out.println("\tInput string x = " + x);
@@ -14,7 +14,7 @@ public class Test {
     }
     
     static boolean testDistance1(String x, String y, int output) {
-        int result = SolutionOriginal.distance1(x, y);
+        int result = Solution.distance1(x, y);
         if(result != output) {
             System.out.println("\tTest failed. Expected " + output + ", got " + result);
             System.out.println("\tInput string x = " + x);
@@ -24,7 +24,7 @@ public class Test {
     }
     
     static boolean testDistance2(String x, String y, int output) {
-        int result = SolutionOriginal.distance2(x, y);
+        int result = Solution.distance2(x, y);
         if(result != output) {
             System.out.println("\tTest failed. Expected " + output + ", got " + result);
             System.out.println("\tInput string x = " + x);
