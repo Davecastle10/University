@@ -141,7 +141,7 @@ public class Solution {
             and we do not need to run an additional bfs algorithm, considering the current code is already kinda bfs inspired.
             */
 
-            for (int i = 0; i < x.length() -2; i++)
+            for (int i = 0; i < x.length() -3; i++)// changed back to -3 as it seems like it wpould make more sense
             {
                 System.out.println("Q2 strings");
                 System.out.println(queue.peek());
@@ -153,7 +153,7 @@ public class Solution {
                 //System.out.println(currentX);
 
                 char[] xArray = currentXNode.get(0).toCharArray();
-                List<String> newX = new ArrayList<>();
+                List<String> newX = null;
                 //currentX = currentX.trim();
                 //y = y.trim();
                 System.out.println("y value: ," +y);
@@ -168,44 +168,67 @@ public class Solution {
                 System.out.println(currentXNode.get(0).substring(i, i + 3));
                 System.out.println(i);
 
-                if (currentXNode.get(0).substring(i, i + 3).equals("110"))
+                String substringToCheck = currentXNode.get(0).substring(i, i + 3);
+
+                if (substringToCheck.equals("110"))
                 {
                     xArray[i] = '0';
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '1';
+                    newX = new ArrayList<>();
                     newX.add(new String(xArray));
                     newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
-                else if (currentXNode.get(0).substring(i, i + 3).equals("011"))
+                else if (substringToCheck.equals("011"))
                 {
                     xArray[i] = '1';
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '0';
+                    newX = new ArrayList<>();
                     newX.add(new String(xArray));
                     newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
-                else if (currentXNode.get(0).substring(i, i + 3).equals("101"))
+                else if (substringToCheck.equals("101"))
                 {
                     xArray[i] = '1';
                     xArray[i + 1] = '1';
                     xArray[i + 2] = '0';
+                    newX = new ArrayList<>();
                     newX.add(new String(xArray));
                     newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
-                else
+                else// probably don't need this else statement
                 {
                     // add something here for if none of the above happen
                     System.out.println("line 167 ish currentX");
                     //newX = currentX;
                 }
-                //System.out.println("line 170 ish currentX: " + currentX);
-                System.out.println(newX);
+                
 
                 int newXIndex = inGraph(newX.get(0), visited);// is -1 if not in visited and the index in visited if it is in visited
                 int xIndex = inGraph(currentXNode.get(0), visited);
 
                 // i can't remeber why i had the length -3 thing here, but if it doesnt work i will remove it later
                 // if in visited
+
+                // if newX has not already been visited and an operation was applied to create a newX
+                if (newX != null && inGraph(newX.get(0), visited) == -1)
+                {
+                    // if newX's string value == y
+                    if (newX.get(0).equals(y))
+                    {
+                        return Integer.parseInt(newX.get(1)) + 1;
+                    }
+
+                    visited.add(newX);
+                    queue.add(newX);
+                }
+
+
+
+                /* don't think this is needed anymore
+
+
                 if (newXIndex != -1 && xIndex != -1 && i != x.length() -3)// add as a child for x if it already exists in the graph
                 {
                     //visited.get(xIndex).add(newX);
@@ -241,6 +264,7 @@ public class Solution {
                     //newList.add(newX);// add new string permutaion to the new list
                     //visited.add(newList);// add the new list to the graph
                 }
+                */
             }
         }
         return -100;
