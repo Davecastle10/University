@@ -147,28 +147,32 @@ public class Solution {
                 System.out.println(queue.peek());
 
                 List<String> currentXNode = queue.poll();
+                String currentXString = currentXNode.get(0);
+                int currentOperationsCount = Integer.parseInt(currentXNode.get(1));
 
                 //String currentX = qu.get(0);
 
                 //System.out.println(currentX);
 
-                char[] xArray = currentXNode.get(0).toCharArray();
+                char[] xArray = currentXString.toCharArray();
                 List<String> newX = null;
                 //currentX = currentX.trim();
                 //y = y.trim();
                 System.out.println("y value: ," +y);
+                /* 
                 if (currentXNode.get(0).equals(y))
                 {
                     System.out.println("return here ");
                     return Integer.parseInt(currentXNode.get(1));// return the number representing the number of operations performed to reach thispoint
                 }
+                */
 
 
                 System.out.println(currentXNode.get(0));
                 System.out.println(currentXNode.get(0).substring(i, i + 3));
                 System.out.println(i);
 
-                String substringToCheck = currentXNode.get(0).substring(i, i + 3);
+                String substringToCheck = currentXString.substring(i, i + 3);
 
                 if (substringToCheck.equals("110"))
                 {
@@ -177,7 +181,7 @@ public class Solution {
                     xArray[i + 2] = '1';
                     newX = new ArrayList<>();
                     newX.add(new String(xArray));
-                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
+                    newX.add( String.valueOf(currentOperationsCount + 1));
                 }
                 else if (substringToCheck.equals("011"))
                 {
@@ -186,7 +190,7 @@ public class Solution {
                     xArray[i + 2] = '0';
                     newX = new ArrayList<>();
                     newX.add(new String(xArray));
-                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
+                    newX.add( String.valueOf(currentOperationsCount + 1));
                 }
                 else if (substringToCheck.equals("101"))
                 {
@@ -195,7 +199,7 @@ public class Solution {
                     xArray[i + 2] = '0';
                     newX = new ArrayList<>();
                     newX.add(new String(xArray));
-                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
+                    newX.add( String.valueOf(currentOperationsCount + 1));
                 }
                 else// probably don't need this else statement
                 {
@@ -205,8 +209,8 @@ public class Solution {
                 }
                 
 
-                int newXIndex = inGraph(newX.get(0), visited);// is -1 if not in visited and the index in visited if it is in visited
-                int xIndex = inGraph(currentXNode.get(0), visited);
+                //int newXIndex = inGraph(newX.get(0), visited);// is -1 if not in visited and the index in visited if it is in visited
+                //int xIndex = inGraph(currentXNode.get(0), visited);
 
                 // i can't remeber why i had the length -3 thing here, but if it doesnt work i will remove it later
                 // if in visited
@@ -217,54 +221,13 @@ public class Solution {
                     // if newX's string value == y
                     if (newX.get(0).equals(y))
                     {
-                        return Integer.parseInt(newX.get(1)) + 1;
+                        return currentOperationsCount + 1;
                     }
 
                     visited.add(newX);
                     queue.add(newX);
                 }
 
-
-
-                /* don't think this is needed anymore
-
-
-                if (newXIndex != -1 && xIndex != -1 && i != x.length() -3)// add as a child for x if it already exists in the graph
-                {
-                    //visited.get(xIndex).add(newX);
-                    //queue.add(newX);
-
-                    // if current number of operations > new num,ber of operations, change to the smaller number.
-                    if (Integer.parseInt(visited.get(newXIndex).get(1)) > Integer.parseInt(newX.get(1)))
-                    {
-                        visited.get(newXIndex).set(1, newX.get(1));
-                    }
-                    
-                    //graph[xIndex]. add to the graph somehow
-                }
-                else if (newXIndex != -1 && xIndex != -1)// add as a child for x if it already exists in the graph
-                {
-                    //visited.get(xIndex).add(newX);
-                    //queue.add(newX);
-
-                    // if current number of operations > new num,ber of operations, change to the smaller number.
-                    if (Integer.parseInt(visited.get(newXIndex).get(1)) > Integer.parseInt(newX.get(1)))
-                    {
-                        visited.get(newXIndex).set(1, newX.get(1));
-                    }
-                    
-                    //graph[xIndex]. add to the graph somehow
-                }
-                else if (xIndex != -1)// add newX to the graph and give it an arraylist/list thingy that its children can be referenced in in the future. also add newX to the queue so it will eventually get searched through
-                {
-                    //System.out.println(newX);
-                    queue.add(newX);// add the string for the new permuataton to the queue
-                    visited.add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
-                    //List<String> newList = new ArrayList<>();// new list
-                    //newList.add(newX);// add new string permutaion to the new list
-                    //visited.add(newList);// add the new list to the graph
-                }
-                */
             }
         }
         return -100;
