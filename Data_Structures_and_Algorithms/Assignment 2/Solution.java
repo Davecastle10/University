@@ -150,22 +150,20 @@ public class Solution {
 
                 //String currentX = qu.get(0);
 
-                System.out.println(currentX);
+                //System.out.println(currentX);
 
                 char[] xArray = currentXNode.get(0).toCharArray();
-                List<String> newX;
+                List<String> newX = new ArrayList<>();
                 //currentX = currentX.trim();
                 //y = y.trim();
                 System.out.println("y value: ," +y);
                 if (currentXNode.get(0).equals(y))
                 {
                     System.out.println("return here ");
-                    return Integer.parseInt(currentXNode.get(1));// change this to have it be the case where it starts the shrotest path search over the array
+                    return Integer.parseInt(currentXNode.get(1));// return the number representing the number of operations performed to reach thispoint
                 }
 
 
-                // add code to swap the 3 char substring for its permutaion - think this nwo done
-                // add permutation as a child of current/old string on graph array, and permutaion as new node if ti doesnt alreay exist
                 System.out.println(currentXNode.get(0));
                 System.out.println(currentXNode.get(0).substring(i, i + 3));
                 System.out.println(i);
@@ -176,7 +174,7 @@ public class Solution {
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '1';
                     newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
                 else if (currentXNode.get(0).substring(i, i + 3).equals("011"))
                 {
@@ -184,7 +182,7 @@ public class Solution {
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '0';
                     newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
                 else if (currentXNode.get(0).substring(i, i + 3).equals("101"))
                 {
@@ -192,7 +190,7 @@ public class Solution {
                     xArray[i + 1] = '1';
                     xArray[i + 2] = '0';
                     newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX.add( String.valueOf(Integer.parseInt(currentXNode.get(1)) + 1));
                 }
                 else
                 {
@@ -203,19 +201,34 @@ public class Solution {
                 //System.out.println("line 170 ish currentX: " + currentX);
                 System.out.println(newX);
 
-                int newXIndex = inGraph(newX);
-                int xIndex = inGraph(currentX);
+                int newXIndex = inGraph(newX.get(0), visited);// is -1 if not in visited and the index in visited if it is in visited
+                int xIndex = inGraph(currentXNode.get(0), visited);
+
+                // i can't remeber why i had the length -3 thing here, but if it doesnt work i will remove it later
+                // if in visited
                 if (newXIndex != -1 && xIndex != -1 && i != x.length() -3)// add as a child for x if it already exists in the graph
                 {
-                    visited.get(xIndex).add(newX);
-                    queue.add(newX);
+                    //visited.get(xIndex).add(newX);
+                    //queue.add(newX);
+
+                    // if current number of operations > new num,ber of operations, change to the smaller number.
+                    if (Integer.parseInt(visited.get(newXIndex).get(1)) > Integer.parseInt(newX.get(1)))
+                    {
+                        visited.get(newXIndex).set(1, newX.get(1));
+                    }
                     
                     //graph[xIndex]. add to the graph somehow
                 }
                 else if (newXIndex != -1 && xIndex != -1)// add as a child for x if it already exists in the graph
                 {
-                    visited.get(xIndex).add(newX);
+                    //visited.get(xIndex).add(newX);
                     //queue.add(newX);
+
+                    // if current number of operations > new num,ber of operations, change to the smaller number.
+                    if (Integer.parseInt(visited.get(newXIndex).get(1)) > Integer.parseInt(newX.get(1)))
+                    {
+                        visited.get(newXIndex).set(1, newX.get(1));
+                    }
                     
                     //graph[xIndex]. add to the graph somehow
                 }
@@ -223,17 +236,17 @@ public class Solution {
                 {
                     //System.out.println(newX);
                     queue.add(newX);// add the string for the new permuataton to the queue
-                    visited.get(xIndex).add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
-                    List<String> newList = new ArrayList<>();// new list
-                    newList.add(newX);// add new string permutaion to the new list
-                    visited.add(newList);// add the new list to the graph
+                    visited.add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
+                    //List<String> newList = new ArrayList<>();// new list
+                    //newList.add(newX);// add new string permutaion to the new list
+                    //visited.add(newList);// add the new list to the graph
                 }
             }
         }
         return -100;
     }
 
-    public static int inGraph(String x, List<List<String>> graph)
+    public static int inGraph(String x, List<List<String>> graph)// should probably change this to in visited but can't really be bothered atm
     {
         for (int i = 0; i < graph.size(); i++)
         {
