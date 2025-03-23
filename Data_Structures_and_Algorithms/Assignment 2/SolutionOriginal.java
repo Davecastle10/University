@@ -3,12 +3,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-// this is my alteration fo the solution to implent the changes of doing the distance tracking concurrently with the operations
-// and incorporating the bfs directly
-public class Solution {
+public class SolutionOriginal {
     // instance avriabkles for q2
     // not sure if this being static is good or nto but other stuf wouldnt work if it wasn't
-    //static List<List<String>> graph = new ArrayList<>();// for the graph that the string permutations are made to be placed in.
+    static List<List<String>> graph = new ArrayList<>();// for the graph that the string permutations are made to be placed in.
     // not sure if arraylist approach will work as it most likely wont allow fo rme to have the string value followed by an arraylsit of shildren.
     // might have to use regular lsit or some other shenanigans to get round this.
 
@@ -108,15 +106,12 @@ public class Solution {
         /* need to decide ont he structure of my graph,
            do i go for arraylist[ list[[string] [arraylist(string) to contain children]] ]  
         */
-        Queue<List<String>> queue = new LinkedList<>();
-        List<List<String>> visited = new ArrayList<>();
-
+        Queue<String> queue = new LinkedList<>();
 
         List<String> originalXList = new ArrayList<>();// new list
         originalXList.add(x);// add x to the new list
-        originalXList.add("0");// add distance 0 to x list
-        visited.add(originalXList);// add the new list to the graph
-        queue.add(originalXList);
+        graph.add(originalXList);// add the new list to the graph
+        queue.add(x);
 
         //String newX = x;
 
@@ -145,76 +140,68 @@ public class Solution {
             {
                 System.out.println("Q2 strings");
                 System.out.println(queue.peek());
-
-                List<String> currentXNode = queue.poll();
-
-                //String currentX = qu.get(0);
-
+                String currentX = queue.poll();
                 System.out.println(currentX);
+                char[] xArray = currentX.toCharArray();
+                String newX = "";
 
-                char[] xArray = currentXNode.get(0).toCharArray();
-                List<String> newX;
                 //currentX = currentX.trim();
                 //y = y.trim();
                 System.out.println("y value: ," +y);
-                if (currentXNode.get(0).equals(y))
+                if (currentX.equals(y))
                 {
                     System.out.println("return here ");
-                    return Integer.parseInt(currentXNode.get(1));// change this to have it be the case where it starts the shrotest path search over the array
+                    return 0;// change this to have it be the case where it starts the shrotest path search over the array
                 }
 
 
                 // add code to swap the 3 char substring for its permutaion - think this nwo done
                 // add permutation as a child of current/old string on graph array, and permutaion as new node if ti doesnt alreay exist
-                System.out.println(currentXNode.get(0));
-                System.out.println(currentXNode.get(0).substring(i, i + 3));
+                System.out.println(currentX);
+                System.out.println(currentX.substring(i, i + 3));
                 System.out.println(i);
-
-                if (currentXNode.get(0).substring(i, i + 3).equals("110"))
+                if (currentX.substring(i, i + 3).equals("110"))
                 {
                     xArray[i] = '0';
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '1';
-                    newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX = new String(xArray);
                 }
-                else if (currentXNode.get(0).substring(i, i + 3).equals("011"))
+                else if (currentX.substring(i, i + 3).equals("011"))
                 {
                     xArray[i] = '1';
                     xArray[i + 1] = '0';
                     xArray[i + 2] = '0';
-                    newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX = new String(xArray);
                 }
-                else if (currentXNode.get(0).substring(i, i + 3).equals("101"))
+                else if (currentX.substring(i, i + 3).equals("101"))
                 {
                     xArray[i] = '1';
                     xArray[i + 1] = '1';
                     xArray[i + 2] = '0';
-                    newX.add(new String(xArray));
-                    newX.add(currentXNode.get(1) + 1);
+                    newX = new String(xArray);
                 }
                 else
                 {
                     // add something here for if none of the above happen
-                    System.out.println("line 167 ish currentX");
-                    //newX = currentX;
+                    System.out.println("line 167 ish currentX" + currentX);
+                    newX = currentX;
                 }
-                //System.out.println("line 170 ish currentX: " + currentX);
+                System.out.println("line 170 ish currentX: " + currentX);
                 System.out.println(newX);
 
                 int newXIndex = inGraph(newX);
                 int xIndex = inGraph(currentX);
                 if (newXIndex != -1 && xIndex != -1 && i != x.length() -3)// add as a child for x if it already exists in the graph
                 {
-                    visited.get(xIndex).add(newX);
+                    graph.get(xIndex).add(newX);
                     queue.add(newX);
                     
                     //graph[xIndex]. add to the graph somehow
                 }
-                else if (newXIndex != -1 && xIndex != -1)// add as a child for x if it already exists in the graph
+                if (newXIndex != -1 && xIndex != -1)// add as a child for x if it already exists in the graph
                 {
-                    visited.get(xIndex).add(newX);
+                    graph.get(xIndex).add(newX);
                     //queue.add(newX);
                     
                     //graph[xIndex]. add to the graph somehow
@@ -223,17 +210,17 @@ public class Solution {
                 {
                     //System.out.println(newX);
                     queue.add(newX);// add the string for the new permuataton to the queue
-                    visited.get(xIndex).add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
+                    graph.get(xIndex).add(newX);// add the string for the new permutation to the lsit for it's parent so it can act kinda like a pointer for when I do graph searching later ot find shortest path
                     List<String> newList = new ArrayList<>();// new list
                     newList.add(newX);// add new string permutaion to the new list
-                    visited.add(newList);// add the new list to the graph
+                    graph.add(newList);// add the new list to the graph
                 }
             }
         }
-        return -100;
+        return -1000000;
     }
 
-    public static int inGraph(String x, List<List<String>> graph)
+    public static int inGraph(String x)
     {
         for (int i = 0; i < graph.size(); i++)
         {
@@ -250,6 +237,7 @@ public class Solution {
         Queue<String> nodeQueue = new LinkedList<>();
         List<List<String>> visited = new ArrayList<>();
         List<List<String>> unvisited = new ArrayList<>();
+        unvisited = graph;
         return -1111;
 
     }
