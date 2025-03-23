@@ -130,48 +130,17 @@ public class Solution {
         //String newX = "";
 
         //char[] yArray = y.toCharArray(); 
-        int counter = 0;
-        mainloop : while (!queue.isEmpty() && counter < 100)
+        mainloop : while (!queue.isEmpty())
         {
-            counter = counter + 1;
-            // might need to add another loop here and move the queue code around slighlty to deal with the ifinite looping over the same string problem
-            // if adding additional loop here, check if the current item is already in the graph, and if so move to the next item in the queue.
-            // additionally might want to mess around with the code such that if there is ever no items in the queue when ther should be that -1 is returned
-            // becuase if there are no items in the queue it wouls seem to me like there were no additional permutaions to be added,
-            // and if this occurs withought y being reached and the graph searching algorithm having been called, it impleis y cannot be reached from x.
-
-            /*  could probably also alter the code so that the second item (index 1) of the node sub-array represents the distance from x 
-            //and have it check if the distance is longer or shorter than the current distance every time the same node is found by a differnt 
-            permutaion path, and if the new node is shorter, updat the numebr to the lower 1, this would mean that when y is found it would already give use the number
-            and we do not need to run an additional bfs algorithm, considering the current code is already kinda bfs inspired.
-            */
-
-            // moved these 3 lines outside of the for loop in hopes of preventing early termination
             List<String> currentXNode = queue.poll();
             String currentXString = currentXNode.get(0);
             int currentOperationsCount = Integer.parseInt(currentXNode.get(1));
 
             for (int i = 0; i < x.length() -2; i++)// changed back to -2 realised i was pottentially missing last index
             {
-                System.out.println("Q2 strings");
-                System.out.println(queue.peek());
-
-                
-
-                //String currentX = qu.get(0);
-
-                //System.out.println(currentX);
-
                 char[] xArray = currentXString.toCharArray();
                 List<String> newX = null;
-                //currentX = currentX.trim();
-                //y = y.trim();
-                System.out.println("y value: ," +y);
-
-                // testing prints
-                System.out.println(currentXNode.get(0));
-                System.out.println(currentXNode.get(0).substring(i, i + 3));
-                System.out.println(i);
+                
 
                 String substringToCheck = currentXString.substring(i, i + 3);
 
@@ -204,14 +173,9 @@ public class Solution {
                 }
 
                 // if newX has not already been visited and an operation was applied to create a newX
-                // code to check the value
-                //System.out.println("check val before visited and queue addition");
-                //System.out.println(newX.get(0));
-                //System.out.println(inGraph(newX.get(0), visited));
                 if (newX != null && inGraph(newX.get(0), visited) == -1)
                 {
                     // if newX's string value == y
-                    System.out.println("newX.get(0); " + newX.get(0));
                     if (newX.get(0).equals(y))
                     {
                         return currentOperationsCount + 1;
