@@ -6,14 +6,6 @@ import java.util.Queue;
 // this is my alteration fo the solution to implent the changes of doing the distance tracking concurrently with the operations
 // and incorporating the bfs directly
 public class Solution {
-    // instance avriabkles for q2
-    // not sure if this being static is good or nto but other stuf wouldnt work if it wasn't
-    //static List<List<String>> graph = new ArrayList<>();// for the graph that the string permutations are made to be placed in.
-    // not sure if arraylist approach will work as it most likely wont allow fo rme to have the string value followed by an arraylsit of shildren.
-    // might have to use regular lsit or some other shenanigans to get round this.
-
-    //static Queue<String> queue = new LinkedList<>();// the queue to maintian order of permutaion for the searching of the string
-
 
 
 
@@ -95,19 +87,6 @@ public class Solution {
         // 011 -> 100
         // 101 -> 110
 
-        /*  perhaps try making global tree array/arraylist that cna be edited by any recursive sub call
-            to add further permutaions, and whenever the end is reached run searching algorithm
-            breadthfirst or depthfirst? to determine the shortest path from start to end
-
-            might be better to do 2d array with valu and children, so it can point to all child nodes desendant form that point maybe
-            or too make a custom node class seperately,. although that migth not be allowed so on second thought just go for 2d array
-
-
-        */
-
-        /* need to decide ont he structure of my graph,
-           do i go for arraylist[ list[[string] [arraylist(string) to contain children]] ]  
-        */
         Queue<List<String>> queue = new LinkedList<>();
         List<List<String>> visited = new ArrayList<>();
 
@@ -118,18 +97,11 @@ public class Solution {
         visited.add(originalXList);// add the new list to the graph
         queue.add(originalXList);
 
-        //String newX = x;
-
         if (x.length() < 3)// if the length is less than 3 the operations cannot be performed
         {
             return -1;
         }
 
-
-        //char[] xArray = x.toCharArray();
-        //String newX = "";
-
-        //char[] yArray = y.toCharArray(); 
         mainloop : while (!queue.isEmpty())
         {
             List<String> currentXNode = queue.poll();
@@ -200,15 +172,6 @@ public class Solution {
             }
         }
         return -1;
-    }
-
-    public static int bfs(String x, String y)
-    {
-        Queue<String> nodeQueue = new LinkedList<>();
-        List<List<String>> visited = new ArrayList<>();
-        List<List<String>> unvisited = new ArrayList<>();
-        return -1111;
-
     }
 
 }
