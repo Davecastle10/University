@@ -120,6 +120,11 @@ public class Solution {
 
         //String newX = x;
 
+        if (x.length() < 3)// if the length is less than 3 the operations cannot be performed
+        {
+            return -1;
+        }
+
 
         //char[] xArray = x.toCharArray();
         //String newX = "";
@@ -141,7 +146,7 @@ public class Solution {
             and we do not need to run an additional bfs algorithm, considering the current code is already kinda bfs inspired.
             */
 
-            for (int i = 0; i < x.length() -3; i++)// changed back to -3 as it seems like it wpould make more sense
+            for (int i = 0; i < x.length() -2; i++)// changed back to -2 realised i was pottentially missing last index
             {
                 System.out.println("Q2 strings");
                 System.out.println(queue.peek());
@@ -159,15 +164,8 @@ public class Solution {
                 //currentX = currentX.trim();
                 //y = y.trim();
                 System.out.println("y value: ," +y);
-                /* 
-                if (currentXNode.get(0).equals(y))
-                {
-                    System.out.println("return here ");
-                    return Integer.parseInt(currentXNode.get(1));// return the number representing the number of operations performed to reach thispoint
-                }
-                */
 
-
+                // testing prints
                 System.out.println(currentXNode.get(0));
                 System.out.println(currentXNode.get(0).substring(i, i + 3));
                 System.out.println(i);
@@ -201,24 +199,16 @@ public class Solution {
                     newX.add(new String(xArray));
                     newX.add( String.valueOf(currentOperationsCount + 1));
                 }
-                else// probably don't need this else statement
-                {
-                    // add something here for if none of the above happen
-                    System.out.println("line 167 ish currentX");
-                    //newX = currentX;
-                }
-                
-
-                //int newXIndex = inGraph(newX.get(0), visited);// is -1 if not in visited and the index in visited if it is in visited
-                //int xIndex = inGraph(currentXNode.get(0), visited);
-
-                // i can't remeber why i had the length -3 thing here, but if it doesnt work i will remove it later
-                // if in visited
 
                 // if newX has not already been visited and an operation was applied to create a newX
+                // code to check the value
+                System.out.println("check val before visited and queue addition");
+                System.out.println(newX.get(0));
+                System.out.println(inGraph(newX.get(0), visited));
                 if (newX != null && inGraph(newX.get(0), visited) == -1)
                 {
                     // if newX's string value == y
+                    System.out.println("newX.get(0); " + newX.get(0));
                     if (newX.get(0).equals(y))
                     {
                         return currentOperationsCount + 1;
@@ -230,7 +220,7 @@ public class Solution {
 
             }
         }
-        return -100;
+        return -1;
     }
 
     public static int inGraph(String x, List<List<String>> graph)// should probably change this to in visited but can't really be bothered atm
