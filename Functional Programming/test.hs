@@ -17,4 +17,4 @@ reverseLength :: Int -> [a] -> [a]
 reverseLength x ys = if length(ys) > x then reverse(ys) else ys
 
 doubleAndTen :: [Int] -> [Int]
-doubleAndTen
+doubleAndTen 
