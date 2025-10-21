@@ -32,6 +32,6 @@ greatIsh :: Int -> Int -> Bool
 greatIsh a b    | b < a && a < 2*b = True
                 | otherwise = False
 
-third :: [a] -> a
-third [] = null
-third (x:xs) = third xs -- this will repeat but need to make it so that we only get the third element.
+--third :: [a] -> a
+--third [] = 
+--third (x:xs) = third xs -- this will repeat but need to make it so that we only get the third element.
