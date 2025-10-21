@@ -35,3 +35,4 @@ greatIsh a b    | b < a && a < 2*b = True
 --third :: [a] -> a
 --third [] = 
 --third (x:xs) = third xs -- this will repeat but need to make it so that we only get the third element.
+

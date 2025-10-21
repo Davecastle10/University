@@ -62,7 +62,14 @@ newtype GridWithAPointer a = GridWithAPointer (Grid a, [a], a, [a], Grid a)
 ---------------------------------------------------------------------------------
 
 instance (Show a) => Show (GridWithAPointer a) where
-     show gu l a r gl = show gu
+     --show gu l a r gl = undefined
+      show gu l a r gl | null a = ""
+            | otherwise = undefined
+            where
+--            helper function for making list to string
+--            strGrid = (map (map show) gu) ++ sting for l ++ string for a ++ string for r ++ (map (map show) gl)
+              strGrid = (map (map show) gu) ++ (map (map show) gu) ++ show a ++ (map (map show) gu) ++ (map (map show) gl)
+
 
 ---------------------------------------------------------------------------------
 -- TASK 2
