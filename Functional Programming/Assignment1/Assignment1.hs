@@ -65,14 +65,21 @@ instance (Show a) => Show (GridWithAPointer a) where
      --show gu l a r gl = undefined
       show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
           | null l && null r = ""
-          | otherwise = unwords strGridUpper ++ unwords strGridListLeft ++ " " ++ unwords strGridListRight ++ unwords strGridLower
+          | otherwise = strGridUpper ++ " " ++ unwords strGridListLeft ++ " "  ++ unwords strGridListRight ++ " "  ++ strGridLower
             where
               --helper function for making list to string
               --strGrid = (map (map show) gu) ++ sting for l ++ string for a ++ string for r ++ (map (map show) gl)
-              strGridUpper =  (map show) gu
+              replace :: String -> String
+              replace [] = []
+              replace (x:xs) 
+                  | x == '['  = replace xs  -- Replace '[' with a space
+                  | x == ']'  = replace xs  -- Replace ']' with a space
+                  | x == ','  = ' ' : replace xs  -- Replace ',' with a space
+                  | otherwise = x : replace xs    -- Keep other characters unchanged
+              strGridUpper =  replace  (unwords ((map show) gu))
               strGridListLeft = ((map show) l)
               strGridListRight = ((map show) r) 
-              strGridLower =   (map show) gl
+              strGridLower =   replace (unwords ((map show) gl))
 
 
 
