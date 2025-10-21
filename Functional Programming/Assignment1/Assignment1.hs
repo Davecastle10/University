@@ -63,9 +63,12 @@ newtype GridWithAPointer a = GridWithAPointer (Grid a, [a], a, [a], Grid a)
 
 instance (Show a) => Show (GridWithAPointer a) where
      --show gu l a r gl = undefined
+
+     -- this is a mess at the moment trying to add the padding functionaliity from Grid and it's not working, 
+     -- the owrking replacement can be found in random.hs
       show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
           | null l && null r = ""
-          | otherwise = strGridUpper ++ " " ++ unwords strGridListLeft ++ " "  ++ unwords strGridListRight ++ " "  ++ strGridLower
+          | otherwise = unlines (map showRow g)
             where
               --helper function for making list to string
               --strGrid = (map (map show) gu) ++ sting for l ++ string for a ++ string for r ++ (map (map show) gl)
@@ -81,7 +84,15 @@ instance (Show a) => Show (GridWithAPointer a) where
               strGridListRight = ((map show) r) 
               strGridLower =   replace (unwords ((map show) gl))
 
+              strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
+              colWidths = [maximum (map visibleLength col) | col <- transpose strGrid]
+              showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]
+              padRight n s = s ++ replicate (n - visibleLength s) ' '
+              -- show (Grid gu)
 
+-- for testing
+g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
+g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
 
 ---------------------------------------------------------------------------------
 -- TASK 2
