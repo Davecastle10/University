@@ -68,7 +68,7 @@ instance (Show a) => Show (GridWithAPointer a) where
      -- the owrking replacement can be found in random.hs
       show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
           | null l && null r = ""
-          | otherwise = unlines (map showRow g)
+          | otherwise = strGridUpperD --unlines (map showRow g)
             where
               --helper function for making list to string
               --strGrid = (map (map show) gu) ++ sting for l ++ string for a ++ string for r ++ (map (map show) gl)
@@ -80,19 +80,24 @@ instance (Show a) => Show (GridWithAPointer a) where
                   | x == ','  = ' ' : replace xs  -- Replace ',' with a space
                   | otherwise = x : replace xs    -- Keep other characters unchanged
               strGridUpper =  replace  (unwords ((map show) gu))
+              strGridUpperD =  show (Grid gu)
               strGridListLeft = ((map show) l)
               strGridListRight = ((map show) r) 
               strGridLower =   replace (unwords ((map show) gl))
 
               strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
+{-
               colWidths = [maximum (map visibleLength col) | col <- transpose strGrid]
               showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]
               padRight n s = s ++ replicate (n - visibleLength s) ' '
               -- show (Grid gu)
+-}
 
 -- for testing
 g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
 g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
+
+g_4 = Grid [["1","2"],["3","4"]]
 
 ---------------------------------------------------------------------------------
 -- TASK 2

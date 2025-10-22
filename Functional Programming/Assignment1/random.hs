@@ -16,3 +16,23 @@ show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
               strGridListRight = ((map show) r) 
               strGridLower =   replace (unwords ((map show) gl))
               -- show (Grid gu)
+
+
+
+-- figure out how this works properly
+newtype Grid a = Grid { grid :: [[a]] } deriving Eq
+
+instance (Show a) => Show (Grid a) where
+  show (Grid g)
+    | null g = ""
+    | otherwise = unlines (map showRow g) -- take the lists in grid run show row on each list/row then use unlines to print line by line.
+    where
+      strGrid = map (map show) g -- get the string for the list
+      colWidths = [maximum (map visibleLength col) | col <- transpose strGrid]
+      showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]
+      padRight n s = s ++ replicate (n - visibleLength s) ' '
+
+transpose :: [[a]] -> [[a]]
+transpose [] = []
+transpose ([]:_) = []
+transpose x = map head x : transpose (map tail x)
