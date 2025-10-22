@@ -89,21 +89,34 @@ instance (Show a) => Show (GridWithAPointer a) where
               replace' [] = []
               replace' (x:xs)
                   | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
-                  | x == '\\'  = replace' xs  -- Remove '\' (single backslash)
-                  | x == '"'   = replace' xs  -- Remove '"'
+                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
+                  | x == '\\'  = replace' xs  -- Remove backslashes
+                  | x == '"'   = replace' xs  -- Remove quotes
                   | otherwise  = x : replace' xs  -- Keep other characters unchanged
+              
+              replace'' :: String -> String
+              replace'' [] = []
+              replace'' (x:xs)
+                  | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
+                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
+                  | x == '\\'  = replace' xs  -- Remove backslashes
+                  | x == '"'   = replace' xs  -- Remove quotes
+                  | otherwise  = x : replace' xs  -- Keep other characters unchanged
+              
+              
 
               strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
               middleRow = l ++ [pointer] ++ r
               middleRowListString = [ show x | x <- middleRow]
               strGridList = (((map show) gu)) ++ ["["] ++ middleRowListString ++ ["]"] ++ (((map show) gl))
-              strGridListStr = replace' (show strGridList)
-{-
-              colWidths = [maximum (map visibleLength col) | col <- transpose strGrid]
+              strGridListStr = replace' (replace' (show strGridList))
+
+              -- need to get this bit working.
+              colWidths = [maximum (map visibleLength col) | col <- transpose strGridListStr]
               showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]
               padRight n s = s ++ replicate (n - visibleLength s) ' '
               -- show (Grid gu)
--}
+
 
 -- for testing
 g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
