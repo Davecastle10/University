@@ -105,21 +105,25 @@ instance (Show a) => Show (GridWithAPointer a) where
               
               
 
-              strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
+              -- strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
+              listForMiddleGrid = (reverse l) ++ [pointer] ++ r
+              middleGridForstrGrid = Grid [] listForMiddleGrid
+              strGrid = map (map show) (gu + middleGridForstrGrid + gl) 
+              
               middleRow = l ++ [pointer] ++ r
               middleRowListString = [ show x | x <- middleRow]
               strGridList = (((map show) gu)) ++ ["["] ++ middleRowListString ++ ["]"] ++ (((map show) gl))
               strGridListStr = replace' (replace' (show strGridList))
 
               -- need to get this bit working.
-              colWidths = [maximum (map visibleLength col) | col <- transpose strGridListStr]
-              showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]
+              colWidths = [maximum (map visibleLength col) | col <- transpose strGrid] -- feed this the top grid and the middle row an dbottom grid
+              showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]-- feed top and bootm grids to this and a slightly alter middle row.
               padRight n s = s ++ replicate (n - visibleLength s) ' '
               -- show (Grid gu)
 
 
 -- for testing
-g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
+g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[11,12],13,[14,15],Grid [[16,17,18,19,20]])
 g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
 
 g_3fun = map(map show) [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
