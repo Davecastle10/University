@@ -107,8 +107,8 @@ instance (Show a) => Show (GridWithAPointer a) where
 
               -- strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
               listForMiddleGrid = (reverse l) ++ [pointer] ++ r
-              middleGridForstrGrid = Grid [] listForMiddleGrid
-              strGrid = map (map show) (gu + middleGridForstrGrid + gl) 
+              middleGridForstrGrid = [ listForMiddleGrid]
+              strGrid = map (map show) (gu ++ middleGridForstrGrid ++ gl) 
               
               middleRow = l ++ [pointer] ++ r
               middleRowListString = [ show x | x <- middleRow]
