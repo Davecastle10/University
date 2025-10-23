@@ -68,7 +68,7 @@ instance (Show a) => Show (GridWithAPointer a) where
      -- the owrking replacement can be found in random.hs
       show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
           | null l && null r = ""
-          | otherwise = strGridListStr  --unlines (map showRow g)
+          | otherwise = outStr  --unlines (map showRow g)
             where
               strGridUpper =  undefined --replace  (unwords ((map show) gu))
               strGridUpperD =  show (Grid gu)
@@ -76,16 +76,21 @@ instance (Show a) => Show (GridWithAPointer a) where
               strGridListRight = ((map show) r) 
               strGridLower =   undefined --replace (unwords ((map show) gl))
 
-              
-              
-              
+            
               strGrid = map (map show) (gu ++ [(reverse l) ++ [pointer] ++ r] ++ gl) 
 
               -- need to get this bit working.
               colWidths = [maximum (map visibleLength col) | col <- transpose strGrid] -- feed this the top grid and the middle row an dbottom grid
               showRow row = unwords [padRight w s | (w, s) <- zip colWidths (map show row)]-- feed top and bootm grids to this and a slightly alter middle row.
+              showStrRow row = unwords [padRight w s | (w, s) <- zip colWidths (row)]
               padRight n s = s ++ replicate (n - visibleLength s) ' '
               -- show (Grid gu)
+
+              middleRow = map show l ++ ["\ESC[44m" ++ show pointer ++ "\ESC[0m"] ++ map show r
+              outStr = unlines (map showRow gu) ++ showStrRow middleRow ++ "\n" ++ unlines (map showRow gl)
+
+
+
 
 
 -- for testing
