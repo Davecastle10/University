@@ -70,50 +70,16 @@ instance (Show a) => Show (GridWithAPointer a) where
           | null l && null r = ""
           | otherwise = strGridListStr  --unlines (map showRow g)
             where
-              --helper function for making list to string
-              --strGrid = (map (map show) gu) ++ sting for l ++ string for a ++ string for r ++ (map (map show) gl)
-              replace :: String -> String
-              replace [] = []
-              replace (x:xs) 
-                  | x == '['  = replace xs  -- Replace '[' with a space
-                  | x == ']'  = replace xs  -- Replace ']' with a space
-                  | x == ','  = ' ' : replace xs  -- Replace ',' with a space
-                  | otherwise = x : replace xs    -- Keep other characters unchanged
-              strGridUpper =  replace  (unwords ((map show) gu))
+              strGridUpper =  undefined --replace  (unwords ((map show) gu))
               strGridUpperD =  show (Grid gu)
               strGridListLeft = ((map show) l)
               strGridListRight = ((map show) r) 
-              strGridLower =   replace (unwords ((map show) gl))
+              strGridLower =   undefined --replace (unwords ((map show) gl))
 
-              replace' :: String -> String
-              replace' [] = []
-              replace' (x:xs)
-                  | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
-                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
-                  | x == '\\'  = replace' xs  -- Remove backslashes
-                  | x == '"'   = replace' xs  -- Remove quotes
-                  | otherwise  = x : replace' xs  -- Keep other characters unchanged
-              
-              replace'' :: String -> String
-              replace'' [] = []
-              replace'' (x:xs)
-                  | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
-                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
-                  | x == '\\'  = replace' xs  -- Remove backslashes
-                  | x == '"'   = replace' xs  -- Remove quotes
-                  | otherwise  = x : replace' xs  -- Keep other characters unchanged
               
               
-
-              -- strGrid = strGridUpper ++ unwords strGridListLeft ++ " " ++ "\ESC[44m" ++ show pointer ++ "\ESC[0m"  ++ " " ++ unwords strGridListRight ++ "\n" ++ strGridLower
-              listForMiddleGrid = (reverse l) ++ [pointer] ++ r
-              middleGridForstrGrid = [ listForMiddleGrid]
-              strGrid = map (map show) (gu ++ middleGridForstrGrid ++ gl) 
               
-              middleRow = l ++ [pointer] ++ r
-              middleRowListString = [ show x | x <- middleRow]
-              strGridList = (((map show) gu)) ++ ["["] ++ middleRowListString ++ ["]"] ++ (((map show) gl))
-              strGridListStr = replace' (replace' (show strGridList))
+              strGrid = map (map show) (gu ++ [(reverse l) ++ [pointer] ++ r] ++ gl) 
 
               -- need to get this bit working.
               colWidths = [maximum (map visibleLength col) | col <- transpose strGrid] -- feed this the top grid and the middle row an dbottom grid

@@ -60,3 +60,23 @@ replace' :: String -> String
                   | x == '"'  = replace' xs  -- Remove '"' 
                   -- | x == "[,"  = '[' : replace' xs  -- Remove ','
                   | otherwise = x : replace' xs    -- Keep other characters unchanged
+
+
+
+replace' :: String -> String
+              replace' [] = []
+              replace' (x:xs)
+                  | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
+                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
+                  | x == '\\'  = replace' xs  -- Remove backslashes
+                  | x == '"'   = replace' xs  -- Remove quotes
+                  | otherwise  = x : replace' xs  -- Keep other characters unchanged
+              
+              replace'' :: String -> String
+              replace'' [] = []
+              replace'' (x:xs)
+                  | x == '[' && not (null xs) && head xs == ',' = '[' : replace' (tail xs)  -- Replace "[," with "["
+                  | x == ',' && (null xs || head xs == ']') = replace' xs  -- Remove trailing commas at the end or before ']'
+                  | x == '\\'  = replace' xs  -- Remove backslashes
+                  | x == '"'   = replace' xs  -- Remove quotes
+                  | otherwise  = x : replace' xs  -- Keep other characters unchanged
