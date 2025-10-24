@@ -20,6 +20,7 @@ module Assignment1 ( put,
              ) where
 
 import Data.Char (isLetter)
+import Control.Monad (when)
 
 -- these two function are to correctly measure the width of an entry of a grid, 
 -- i.e. so that the width of "\ESC[44m55\ESC[0m" ignored the escape sequences
@@ -107,17 +108,44 @@ g_4 = Grid [["1","2"],["3","4"]]
 ---------------------------------------------------------------------------------
 
 put :: a -> GridWithAPointer a -> GridWithAPointer a
-put = undefined
+put a (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) = GridWithAPointer(Grid gu, l, a, r, Grid gl)
 
 moveLeft :: GridWithAPointer a -> GridWithAPointer a
-moveLeft = undefined
+moveLeft (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | length l == 0 = error "Can not move any further"
+  | otherwise = GridWithAPointer(Grid gu, newl, newPointer, newr, Grid gl)
+    where
+      newPointer = head l
+      newl = tail l
+      newr = pointer : r
 
 
 moveRight :: GridWithAPointer a -> GridWithAPointer a
-moveRight = undefined
+moveRight (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | length r == 0 = error "Can not move any further"
+  | otherwise = GridWithAPointer(Grid gu, newl, newPointer, newr, Grid gl)
+    where
+      newPointer = head r
+      newr = tail r
+      newl = pointer : l
 
 moveUp :: GridWithAPointer a -> GridWithAPointer a
-moveUp = undefined
+moveUp (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | length gu == 0 = error "Can not move any further"
+  | otherwise = (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
+    where
+      getRow :: Int -> Grid a -> [a]
+      getRow index (Grid g) = g !! index
+      
+      pointerIndex = length l
+      newRow = gu !! ((length gu) - 1)
+      newl = take (maximum(pointerIndex, 0)) newRow
+      newPointer = head (drop pointerIndex newRow)
+      newr = drop (pointerIndex + 1) newRow
+      oldRow = l ++ [pointer] ++ r
+      newGl = ([oldRow] ++ gl)
+      newGu = (take (length gu - 1) gu)
+
 
 moveDown :: GridWithAPointer a -> GridWithAPointer a
 moveDown = undefined
