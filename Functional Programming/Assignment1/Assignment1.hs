@@ -166,16 +166,16 @@ moveDown (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
 ---------------------------------------------------------------------------------
 
 putTatamiUp :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer
-putTatamiUp = undefined
+putTatamiUp a inputGrid = moveDown (put a (moveUp (put a inputGrid)))
 
 putTatamiDown :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer
-putTatamiDown = undefined
+putTatamiDown a inputGrid = moveUp (put a (moveDown (put a inputGrid)))
 
 putTatamiRight :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer
-putTatamiRight = undefined
+putTatamiRight a inputGrid = moveLeft (put a (moveRight (put a inputGrid)))
 
 putTatamiLeft :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer
-putTatamiLeft = undefined
+putTatamiLeft a inputGrid = moveRight (put a (moveLeft (put a inputGrid)))
 
 
 ---------------------------------------------------------------------------------
