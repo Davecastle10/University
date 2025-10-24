@@ -183,4 +183,4 @@ putTatamiLeft a inputGrid = moveRight (put a (moveLeft (put a inputGrid)))
 ---------------------------------------------------------------------------------
 
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
-cover = undefined
+cover grid | undefined -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
