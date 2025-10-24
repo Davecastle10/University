@@ -87,7 +87,7 @@ instance (Show a) => Show (GridWithAPointer a) where
               padRight n s = s ++ replicate (n - visibleLength s) ' '
               -- show (Grid gu)
 
-              middleRow = map show l ++ ["\ESC[44m" ++ show pointer ++ "\ESC[0m"] ++ map show r
+              middleRow = map show (reverse l) ++ ["\ESC[44m" ++ show pointer ++ "\ESC[0m"] ++ map show r
               outStr = unlines (map showRow gu) ++ showStrRow middleRow ++ "\n" ++ unlines (map showRow gl)
 
 
@@ -95,7 +95,7 @@ instance (Show a) => Show (GridWithAPointer a) where
 
 
 -- for testing
-g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[11,12],13,[14,15],Grid [[16,17,18,19,20]])
+g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
 g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
 
 g_3fun = map(map show) [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
@@ -131,24 +131,33 @@ moveRight (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
 
 moveUp :: GridWithAPointer a -> GridWithAPointer a
 moveUp (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
-  | length gu == 0 = error "Can not move any further"
+  | null gu = error "Can not move any further"
   | otherwise = (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
     where
-      getRow :: Int -> Grid a -> [a]
-      getRow index (Grid g) = g !! index
-      
       pointerIndex = length l
-      newRow = gu !! ((length gu) - 1)
-      newl = take (maximum(pointerIndex, 0)) newRow
+      newRow = last gu
+      newl = take pointerIndex newRow
       newPointer = head (drop pointerIndex newRow)
       newr = drop (pointerIndex + 1) newRow
       oldRow = l ++ [pointer] ++ r
       newGl = ([oldRow] ++ gl)
-      newGu = (take (length gu - 1) gu)
+      newGu = init gu
 
 
 moveDown :: GridWithAPointer a -> GridWithAPointer a
-moveDown = undefined
+moveDown (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | null gl = error "Can not move any further"
+  | otherwise = (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
+    where
+      
+      pointerIndex = length l
+      newRow = head gl
+      newl = take pointerIndex newRow
+      newPointer = head (drop pointerIndex newRow)
+      newr = drop (pointerIndex + 1) newRow
+      oldRow = l ++ [pointer] ++ r
+      newGl = ([oldRow] ++ gl)
+      newGu = init gu
 
 
 ---------------------------------------------------------------------------------
