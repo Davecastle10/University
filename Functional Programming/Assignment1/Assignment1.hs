@@ -68,7 +68,7 @@ instance (Show a) => Show (GridWithAPointer a) where
      -- this is a mess at the moment trying to add the padding functionaliity from Grid and it's not working, 
      -- the owrking replacement can be found in random.hs
       show (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
-          | null l && null r = ""
+          | null l && null r = "" -- fix this as doesnt work with 1 wide by 4 tall or 1 wide by x tall grids and la nd r are empty but ther is still stuff to display.
           | otherwise = outStr  --unlines (map showRow g)
             where
               strGridUpper =  undefined --replace  (unwords ((map show) gu))
@@ -96,6 +96,7 @@ instance (Show a) => Show (GridWithAPointer a) where
 
 -- for testing
 g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
+g_5 = GridWithAPointer (Grid [[1],[6]],[],13,[],Grid [[16]])
 g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
 
 g_3fun = map(map show) [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
@@ -156,8 +157,8 @@ moveDown (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
       newPointer = head (drop pointerIndex newRow)
       newr = drop (pointerIndex + 1) newRow
       oldRow = l ++ [pointer] ++ r
-      newGl = ([oldRow] ++ gl)
-      newGu = init gu
+      newGl = drop 1 gl
+      newGu = gu ++ [oldRow]
 
 
 ---------------------------------------------------------------------------------
