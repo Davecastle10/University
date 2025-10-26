@@ -182,5 +182,40 @@ putTatamiLeft a inputGrid = moveRight (put a (moveLeft (put a inputGrid)))
 -- TASK 4
 ---------------------------------------------------------------------------------
 
+-- need to deal with the undefined return values used error cases instead like above in task 2
+
+getRight :: GridWithAPointer Integer -> Integer
+getRight (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | r == [] = error "Item outside of grid, nothing to the right available"
+  | otherwise = head r
+
+getLeft :: GridWithAPointer Integer -> Integer
+getLeft (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | l == [] = error "Item outside of grid, nothing to the left available"
+  | otherwise = head l
+
+getUpper :: GridWithAPointer Integer -> Integer
+getUpper (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | gu == [[]] = error "Item outside of grid, nothing above available"
+  | otherwise = upperPointer
+  where
+    upperRow = last gu
+    pointerIndex = length l
+    upperPointer = head (drop pointerIndex upperRow)
+
+getLower :: GridWithAPointer Integer -> Integer
+getLower (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | gl == [[]] = error "Item outside of grid, nothing below available"
+  | otherwise = lowerPointer
+  where
+    lowerRow = head gl
+    pointerIndex = length l
+    lowerPointer = head (drop pointerIndex lowerRow)
+
+
+
+
+
+
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
-cover grid | undefined -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
+cover grid = undefined -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
