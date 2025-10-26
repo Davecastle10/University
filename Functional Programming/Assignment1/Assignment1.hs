@@ -212,6 +212,45 @@ getLower (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
     pointerIndex = length l
     lowerPointer = head (drop pointerIndex lowerRow)
 
+getPointer :: GridWithAPointer Integer -> Integer
+getPointer (GridWithAPointer(_, _, pointer, _, _)) = pointer
+
+checkCornerNW :: GridWithAPointer Integer -> Bool -- return true if at least 2 items in a 2x2 grid are the same and thus is a valid part of the grid.
+checkCornerNW grid = returnBool
+  where 
+    left = getLeft grid
+    above = getUpper grid
+    corner = getUpper (moveLeft grid)
+    pointer = getPointer grid
+    returnBool = (left == above) || (left == corner) || (left == pointer) || (above == corner) || (above == pointer) || (corner == pointer)
+
+checkCornerNE :: GridWithAPointer Integer -> Bool -- return true if at least 2 items in a 2x2 grid are the same and thus is a valid part of the grid.
+checkCornerNE grid = returnBool
+  where 
+    right = getRight grid
+    above = getUpper grid
+    corner = getUpper (moveRight grid)
+    pointer = getPointer grid
+    returnBool = (right == above) || (right == corner) || (right == pointer) || (above == corner) || (above == pointer) || (corner == pointer)
+
+checkCornerSW :: GridWithAPointer Integer -> Bool -- return true if at least 2 items in a 2x2 grid are the same and thus is a valid part of the grid.
+checkCornerSW grid = returnBool
+  where 
+    left = getLeft grid
+    below = getLower grid
+    corner = getLower (moveLeft grid)
+    pointer = getPointer grid
+    returnBool = (left == below) || (left == corner) || (left == pointer) || (below == corner) || (below == pointer) || (corner == pointer)
+
+checkCornerSE :: GridWithAPointer Integer -> Bool -- return true if at least 2 items in a 2x2 grid are the same and thus is a valid part of the grid.
+checkCornerSE grid = returnBool
+  where 
+    right = getRight grid
+    below = getLower grid
+    corner = getLower (moveRight grid)
+    pointer = getPointer grid
+    returnBool = (right == below) || (right == corner) || (right == pointer) || (below == corner) || (below == pointer) || (corner == pointer)
+
 
 
 
