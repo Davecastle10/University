@@ -270,6 +270,18 @@ validGridWithAPointerSize = not ((gridwidth 'mod' 2 == 0) && (gridLength 'mod' 2
     gridWidth = length (l ++ [pointer] ++ r)
     gridLength = length gu + length + gl + 1
 
+getPointerHorizontalPos :: GridWithAPointer Integer -> Integer
+getPointerHorizontalPos (GridWithAPointer(_, l, _, _, _)) = length l
+
+getPointerVerticalPos :: GridWithAPointer Integer -> Integer
+getPointerVerticalPos (GridWithAPointer(Grid gu, _, _, _, _)) = length gu
+
+
+
+cover' :: GridWithAPointer Integer -> GridWithAPointer Integer -- recursive func to cover grid
+cover' grid = undefined 
+  where
+    
 
 
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
@@ -277,4 +289,3 @@ cover grid
   | validGridWithAPointerSize == False = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
   | otherwise = undefined -- have it return a vaild GridWithAPointer with a valid covergae
   where 
-    
