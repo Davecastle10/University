@@ -252,9 +252,29 @@ checkCornerSE grid = returnBool
     returnBool = (right == below) || (right == corner) || (right == pointer) || (below == corner) || (below == pointer) || (corner == pointer)
 
 
+getGridWithAPointerSize :: GridWithAPointer Integer -> (Integer,Integer) -- returns a tuple containing the integer length and width of a GridWithAPointer
+getGridWithAPointerSize (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) = (gridLength, gridWidth)
+  where
+    gridWidth = length (l ++ [pointer] ++ r)
+    gridLength = length gu + length + gl + 1
 
+getGridSize :: Grid Integer -> (Integer,Integer)
+getGridSize grid = (gridLength, gridWidth)
+  where
+    gridLength = length grid
+    gridWidth = length (grid !! 0)
+
+validGridWithAPointerSize :: GridWithAPointer Integer -> Bool -- returnd tru if the grid is a valid size e.g. not odd length and width
+validGridWithAPointerSize = not ((gridwidth 'mod' 2 == 0) && (gridLength 'mod' 2 == 0))
+  where
+    gridWidth = length (l ++ [pointer] ++ r)
+    gridLength = length gu + length + gl + 1
 
 
 
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
-cover grid = undefined -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
+cover grid 
+  | validGridWithAPointerSize == False = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
+  | otherwise = undefined -- have it return a vaild GridWithAPointer with a valid covergae
+  where 
+    
