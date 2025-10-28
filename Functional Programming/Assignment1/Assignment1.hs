@@ -339,9 +339,13 @@ checkGridValidCovering (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
 cover' :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer -- recursive func to cover grid
 cover' x g@(GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) 
   | null r && null gl = g -- last elemnt in the list hope this works oh well if it doesnt.
-  | (length r >= 1) && not (null gl) = cover' (x+1) (putTatamiRight x g)
+  | length r >= 1 && not (null gl) = cover' (x+1) cont1
   | otherwise = cover' (x+1) (putTatamiRight x g)
-  where 
+  where
+    cont1
+      | not (null gu) && checkCornerNE (putTatamiRight x g) = putTatamiRight x g
+      | not (null gl) && checkCornerSW (putTatamiDown x g) = putTatamiDown x g
+      | otherwise = undefined
     
 
 
