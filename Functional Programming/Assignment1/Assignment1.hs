@@ -96,10 +96,13 @@ instance (Show a) => Show (GridWithAPointer a) where
 
 -- for testing
 g_2 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,8,9,10]],[12,11],13,[14,15],Grid [[16,17,18,19,20]])
+g_20 = GridWithAPointer (Grid [[1,2,3,4,5],[6,7,0,9,10]],[12,11],13,[0,15],Grid [[16,17,0,19,20]])
 g_5 = GridWithAPointer (Grid [[1],[6]],[],13,[],Grid [[16]])
 g_3 = Grid [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
 
 g_3fun = map(map show) [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
+
+g_200 = GridWithAPointer (Grid [],[],0,[0,0,0],Grid [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
 
 g_4 = Grid [["1","2"],["3","4"]]
@@ -133,7 +136,7 @@ moveRight (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
 moveUp :: GridWithAPointer a -> GridWithAPointer a
 moveUp (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
   | null gu = error "Can not move any further"
-  | otherwise = (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
+  | otherwise = GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl)
     where
       pointerIndex = length l
       newRow = last gu
@@ -252,36 +255,36 @@ checkCornerSE grid = returnBool
     returnBool = (right == below) || (right == corner) || (right == pointer) || (below == corner) || (below == pointer) || (corner == pointer)
 
 
-getGridWithAPointerSize :: GridWithAPointer Integer -> (Integer,Integer) -- returns a tuple containing the integer length and width of a GridWithAPointer
+getGridWithAPointerSize :: GridWithAPointer Integer -> (Int,Int) -- returns a tuple containing the integer length and width of a GridWithAPointer
 getGridWithAPointerSize (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) = (gridLength, gridWidth)
   where
     gridWidth = length (l ++ [pointer] ++ r)
-    gridLength = length gu + length + gl + 1
+    gridLength = length gu + length  gl + 1
 
-getGridSize :: Grid Integer -> (Integer,Integer)
-getGridSize grid = (gridLength, gridWidth)
+getGridSize :: Grid Integer -> (Int,Int)
+getGridSize (Grid grid) = (gridLength, gridWidth)
   where
     gridLength = length grid
-    gridWidth = length (grid !! 0)
+    gridWidth = length (head grid)
 
 validGridWithAPointerSize :: GridWithAPointer Integer -> Bool -- returnd tru if the grid is a valid size e.g. not odd length and width
-validGridWithAPointerSize (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
-  | h == 0 -- might have to change
+validGridWithAPointerSize (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) = h == 0
   where
     gridWidth = length (l ++ [pointer] ++ r)
-    gridLength = length gu + length + gl + 1
+    gridLength = length gu + length  gl + 1
     h = (gridWidth * gridLength) `mod` 2 
 
-getPointerHorizontalPos :: GridWithAPointer Integer -> Integer
+getPointerHorizontalPos :: GridWithAPointer Integer -> Int
 getPointerHorizontalPos (GridWithAPointer(_, l, _, _, _)) = length l
 
-getPointerVerticalPos :: GridWithAPointer Integer -> Integer
+getPointerVerticalPos :: GridWithAPointer Integer -> Int
 getPointerVerticalPos (GridWithAPointer(Grid gu, _, _, _, _)) = length gu
 
 -- might need to add another guard for if tyou are at the final item in the grid
-getNextEmptyPos :: GridWithAPointer Integer -> GridWithAPointer Integer 
+getNextEmptyPos :: GridWithAPointer Integer -> GridWithAPointer Integer -- works other than the undefined case
 getNextEmptyPos (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
-  | r == [] = getNextEmptyPos (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
+  | null r && null gl = undefined -- the case for bottom rightmost item in grid what do i do here? hope for the best and pray
+  | null r = getNextEmptyPos (GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl))
   | pointer == 0 = GridWithAPointer(Grid gu, l, pointer, r, Grid gl)
   | otherwise = getNextEmptyPos (moveRight (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)))
   where
@@ -298,16 +301,52 @@ getNextEmptyPos (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
     -- if made it to the end without encountering 0 grid is covered
     -- not in this function but at that point would check if grid follows rules.
 
+checkCornerSE0:: GridWithAPointer Integer -> Bool -- return true if at least 2 items in a 2x2 grid are the same and thus is a valid part of the grid.
+checkCornerSE0 grid = returnBool
+  where 
+    right = getRight grid
+    below = getLower grid
+    corner = getLower (moveRight grid)
+    pointer = getPointer grid
+    returnBool = (right == 0) || (0 == corner) || (0 == pointer) || (below == 0)
+
+moveDownRow :: GridWithAPointer Integer -> GridWithAPointer Integer
+moveDownRow (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | null gl = GridWithAPointer(Grid gu, l, pointer, r, Grid gl)
+  | otherwise = GridWithAPointer(Grid newGu, newl, newPointer, newr, Grid newGl)
+  where
+    newRow = head gl
+    newl = []
+    newPointer = head newRow
+    newr = tail newRow
+    oldRow = l ++ [pointer] ++ r
+    newGl = drop 1 gl
+    newGu = gu ++ [oldRow] 
+
+
+checkGridValidCovering :: GridWithAPointer Integer -> Bool -- not sure if this actually works
+checkGridValidCovering (GridWithAPointer(Grid gu, l, pointer, r, Grid gl))
+  | not (checkCornerSE0 grid) && length r == 1 && not (null gl) = checkCornerSE grid && checkGridValidCovering cont -- no 0 in grid and there is stuff to right and below check the corner and recursively call again
+  | otherwise = False -- ? shouldnt get to this i hope?
+  where
+    grid = GridWithAPointer(Grid gu, l, pointer, r, Grid gl)
+    cont 
+      | null r && not (null gl) =  moveDownRow grid -- no space to right and there is space below move to start of row below
+      | otherwise = moveRight grid -- space to right move right, wouldnt have been called if bothe right and below are null
     
 
 
-cover' :: GridWithAPointer Integer -> GridWithAPointer Integer -- recursive func to cover grid
-cover' grid = undefined 
-  --where
+cover' :: Integer -> GridWithAPointer Integer -> GridWithAPointer Integer -- recursive func to cover grid
+cover' x g@(GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) 
+  | null r && null gl = g -- last elemnt in the list hope this works oh well if it doesnt.
+  | (length r >= 1) && not (null gl) = cover' (x+1) (putTatamiRight x g)
+  | otherwise = cover' (x+1) (putTatamiRight x g)
+  where 
+    
 
 
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
 cover grid 
-  | not validGridWithAPointerSize = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
-  | otherwise = cover' grid -- have it return a vaild GridWithAPointer with a valid covergae
+  | not (validGridWithAPointerSize grid) = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
+  | otherwise = cover' 1 grid -- have it return a vaild GridWithAPointer with a valid covergae
   --where 
