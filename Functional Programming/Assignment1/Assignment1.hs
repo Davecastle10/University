@@ -276,16 +276,22 @@ getPointerHorizontalPos (GridWithAPointer(_, l, _, _, _)) = length l
 getPointerVerticalPos :: GridWithAPointer Integer -> Integer
 getPointerVerticalPos (GridWithAPointer(Grid gu, _, _, _, _)) = length gu
 
-
+getNextEmptyPos :: GridWithAPointer Integer -> GridWithAPointer Integer 
+getNextEmptyPos (GridWithAPointer(Grid gu, l, pointer, r, Grid gl)) = returnGrid
+  where
+    -- move rigth until find 0
+    -- if edge go down to next level
+    -- when the pointer is 0 return the current grid
+    -- if made it to the end without encountering 0 grid is covered
+    -- not in this function but at that point would check if grid follows rules.
 
 cover' :: GridWithAPointer Integer -> GridWithAPointer Integer -- recursive func to cover grid
 cover' grid = undefined 
-  where
-    
+  --where
 
 
 cover :: GridWithAPointer Integer -> GridWithAPointer Integer
 cover grid 
-  | validGridWithAPointerSize == False = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
+  | not validGridWithAPointerSize = error "Grid not valid" -- if the gird is odd dimension in btoh dimensions e.g 5x7 then instantly discard as no covergae availabe 
   | otherwise = undefined -- have it return a vaild GridWithAPointer with a valid covergae
-  where 
+  --where 
