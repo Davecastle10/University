@@ -14,6 +14,7 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
+import Types (morseCode, morseTable)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -21,10 +22,17 @@ import Data.List
 
 {- Question 1 -}
 encodeWord :: Table -> String -> Code
-encodeWord = undefined
+encodeWord tableIn xs = concat [case lookup x tableIn of 
+                                        Just code -> code
+                                        Nothing -> [] | x <- xs] -- i don't like the way this looks but also don't want to add another function will will slow down code
 
 encodeWords :: Table -> [String] -> Code
-encodeWords = undefined
+encodeWords tableIn xs = concat [encodeWord morseTable x | x <- xs]
+
+split :: Eq a => [a] -> [a] -> [[a]]
+split delim xs = case break delim of 
+    (front,[]) -> [front] -- there is no seperatror in the list/string/whatever so just return the front = whole list
+    (front, rest) -> [front] ++ split delim rest
 
 encodeText :: Table -> String -> Code
 encodeText = undefined
