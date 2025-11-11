@@ -30,9 +30,9 @@ encodeWords :: Table -> [String] -> Code
 encodeWords tableIn xs = concat [encodeWord morseTable x | x <- xs]
 
 split :: Eq a => [a] -> [a] -> [[a]]
-split delim xs = case break delim of 
-    (front,[]) -> [front] -- there is no seperatror in the list/string/whatever so just return the front = whole list
-    (front, rest) -> [front] ++ split delim rest -- migth not need the [] around front here if the base case when nothing left sorts it out, but test later.
+split delim xs = case break (==delim) xs of 
+    (front, []) -> front -- there is no seperatror in the list/string/whatever so just return the front = whole list
+    (front, rest) -> front ++ split delim (drop (length delim) rest) -- migth not need the [] around front here if the base case when nothing left sorts it out, but test later.
 
 encodeText :: Table -> String -> Code
 encodeText = undefined
