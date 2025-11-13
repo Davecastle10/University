@@ -101,6 +101,7 @@ decodeText morseTable codeIn = undefined
         -- letterWords = map split (shortGap ++ [Silence]) words
         letterWords = [ split (shortGap ++ [Silence]) x | x <- words]
         decodedLetterWords = [ [ unMaybe (reverseLookup x) | x <- xs] | xs <- letterWords]
+        -- now just need to go through and connect the list of list of char into list of char ++ space ++ list of char etc to make a decode string
 
 
 reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
