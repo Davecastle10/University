@@ -14,8 +14,6 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
-import Types (morseCode, morseTable, Atom (Beep, Silence))
-import Language.Haskell.TH (Code)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -60,16 +58,27 @@ splitComma xs = case break (==',') xs of
     (front, rest) -> [front] ++ splitComma (drop 1 rest) -- migth not need the [] around front here if the base case when nothing left sorts it out, but test later.
 
 
-stringToAtom :: [[Char]] -> Atom
+stringToAtom :: String -> Atom
 stringToAtom stringIn
     | stringIn == "Beep" = Beep
     | stringIn == "Silence" = Silence -- could proabbly just have this by the otherwise case but that just seems wrong
     | otherwise = error "Beep Beep propagande Beep" -- I dont think this will ever occur but it seemed funny 
 
+{-}
+split :: Eq a => [a] -> [a] -> [[a]]
+split delim xs = case break (==delim) xs of 
+    (front, []) -> front -- there is no seperatror in the list/string/whatever so just return the front = whole list
+    (front, rest) -> front ++ split delim (drop (length delim) rest) -- migth not need the [] around front here if the base case when nothing left sorts it out, but test later.
+-}
 -- alt take length delim if it is delim, then drop delim
 
---split :: Eq a => [a] -> [a] -> [[a]]
-
+split :: Eq a => [a] -> [a] -> [[a]]
+split delim xs = filter (not . null) (splitHelper xs)
+  where
+    splitHelper [] = [[]] -- if empty list make list of empty list for nice base case
+    splitHelper ys@(y:ys') -- make ys into y (the head of ys) and ys' the rest of ys the @ symbol usage is really cool, it makes this sort of stuff way eaier
+      | delim `isPrefixOf` ys = [] : splitHelper (drop (length delim) ys) -- if the deliminator is the prefix of ys the drop it and call the function again
+      | otherwise = let (h:t) = splitHelper ys' in (y:h) : t -- calls split helper recursively on the tail of ys then recmobines as it backtracks throught the recursive call
 
 
 
@@ -80,10 +89,16 @@ encodeText tableIn stringIn = encodeWords tableIn (words stringIn)
 
 {- Question 2 -}
 decodeText :: Table -> Code -> String
-decodeText = undefined
+decodeText morseTable codeIn = undefined
+    where
+        -- words = [ x ++ [Silence]| x <- split (mediumGap ++ [Silence]) codeIn] -- ws going to remove all seven silences and then add backe to end of each word but think can get round this
+        words = [ x ++ [Silence]| x <- split (mediumGap ++ [Silence]) codeIn] 
+        -- letterWords = map split (shortGap ++ [Silence]) words
+        letterWords = [ split (shortGap ++ [Silence]) x | x <- words]
+
 
 {- Question 3 -}
-decodeTextWithTree :: Tree -> Code-> String
+decodeTextWithTree :: Tree -> Code -> String
 decodeTextWithTree = undefined
 
 {- Question 4 -}
