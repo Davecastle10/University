@@ -101,7 +101,8 @@ decodeText morseTable codeIn = undefined
 reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
 reverseLookup codeIn tableIn
     | null tableIn = Nothing
-    | otherwise = Just (head (filter (\(a, b) -> b == codeIn) tableIn))
+    | filter (\(_, b) -> b == codeIn) tableIn = Just (head (filter (\(a, b) -> b == codeIn) tableIn))
+    | otherwise = Nothing
 
 -- head (filter (\x -> snd x == codeIn) tableIn)))
 
