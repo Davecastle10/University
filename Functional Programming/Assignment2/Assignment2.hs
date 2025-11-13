@@ -14,11 +14,15 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
-import Data.Maybe (Maybe(Nothing))
+import Data.Foldable (all)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
 ---------------------------------------------------------------------------------
+
+unMaybe :: Maybe a -> a
+unMaybe Maybe a = a
+unMaybe Just a = a
 
 {- Question 1 -}
 encodeWord :: Table -> String -> Code
@@ -96,13 +100,16 @@ decodeText morseTable codeIn = undefined
         words = [ x ++ [Silence]| x <- split (mediumGap ++ [Silence]) codeIn] 
         -- letterWords = map split (shortGap ++ [Silence]) words
         letterWords = [ split (shortGap ++ [Silence]) x | x <- words]
+        decodedLetterWords = [ [ unMaybe (reverseLookup x) | x <- xs] | xs <- letterWords]
 
 
 reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
 reverseLookup codeIn tableIn
     | null tableIn = Nothing
-    | filter (\(_, b) -> b == codeIn) tableIn = Just (head (filter (\(a, b) -> b == codeIn) tableIn))
+    | not (null (filter (\(_, b) -> b == codeIn) tableIn)) = Just (fst (head (filter (\(a, b) -> b == codeIn) tableIn)))
     | otherwise = Nothing
+
+
 
 -- head (filter (\x -> snd x == codeIn) tableIn)))
 
