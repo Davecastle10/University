@@ -14,6 +14,7 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
+import Data.Maybe (Maybe(Nothing))
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -95,6 +96,14 @@ decodeText morseTable codeIn = undefined
         words = [ x ++ [Silence]| x <- split (mediumGap ++ [Silence]) codeIn] 
         -- letterWords = map split (shortGap ++ [Silence]) words
         letterWords = [ split (shortGap ++ [Silence]) x | x <- words]
+
+
+reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
+reverseLookup codeIn tableIn
+    | null tableIn = Nothing
+    | otherwise = Just (head (filter (\(a, b) -> b == codeIn) tableIn))
+
+-- head (filter (\x -> snd x == codeIn) tableIn)))
 
 
 {- Question 3 -}
