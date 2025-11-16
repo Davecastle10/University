@@ -14,7 +14,6 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
-import Data.ByteString.Char8 (unwords)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
