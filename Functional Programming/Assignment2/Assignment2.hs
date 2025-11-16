@@ -195,7 +195,6 @@ updateTree tree table = foldl update tree (directionsTable table)
         update treee (character, directions) = traverseTableTree treee directions (character)
 
 
--- not sure if actually need this anymore
 directionsTable :: Table -> [(Maybe Char, [Direction])] -- make a version of the table that is list of pairs pf value and the direction to it's node
 directionsTable table = [ (Just c , ditdahSplit b) | (c, b) <-  table]
 
