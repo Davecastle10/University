@@ -230,9 +230,9 @@ traverseTreeTable (Branch (Just char) Empty Empty) path table = (Empty, Path (ta
 
 
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
-traverseTreeTable (Branch Nothing left Empty) path table = (Empty, path, table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
-traverseTreeTable (Branch Nothing Empty right) path table = (Empty, path, table ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
-traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, path, table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
 
 {-}
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
@@ -240,9 +240,9 @@ traverseTreeTable (Branch Nothing left Empty) path table = traverseTreeTable lef
 traverseTreeTable (Branch Nothing Empty right) path table = traverseTreeTable right path table
 traverseTreeTable (Branch Nothing left right) path table = traverseTreeTable left path table
 -}
-traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, path, table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
-traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, path, table ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
-traverseTreeTable (Branch (Just char) left right) path table = (Branch (Just char) Empty right, path, table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) left right) path table = (Branch (Just char) Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
 
 {-}
 traverseTreeTable (Branch value left right) [] val = (Branch val left right)
