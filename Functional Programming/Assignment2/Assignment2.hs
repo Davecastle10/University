@@ -213,7 +213,49 @@ traverseTableTree (Branch value left right) (GoRight:xs) val = Branch value left
 
 {- Question 5 -}
 tabulate :: Tree -> Table
-tabulate = undefined
+tabulate treeIn = getTable (traverseTableTree treeIn startPath retTable)
+    where
+        retTable :: Table
+        startPath :: Path
+        startPath = Empty
+
+data Path a = Empty | Path [(Direction, a)] deriving (Show, Eq)
+
+traverseTreeTable :: Tree -> Path Char -> Table -> (Tree, Path Char, Table)
+traverseTreeTable Empty path table  = (Empty, path, table)
+traverseTreeTable (Branch (Just char) Empty Empty) path table = (Empty, tail path, (char, pathToCode path))
+traverseTreeTable (Branch (Just char) left _) path table = traverseTreeTable left ((GoLeft, char) : path) table
+traverseTreeTable (Branch (Just char) Empty right) path table = traverseTreeTable right ((GoRight, char) : path) table
+{-}
+traverseTreeTable (Branch value left right) [] val = (Branch val left right)
+traverseTreeTable (Branch value left right) (GoLeft:xs) val = Branch value (traverseTreeTable left xs val) right
+traverseTreeTable (Branch value left right) (GoRight:xs) val = Branch value left (traverseTreeTable right xs val)
+-}
+
+getTable :: (Tree, Path a, Table) -> Table
+getTable (x, y, z) = z
+
+
+pathToDirections :: Path a -> [Direction]
+pathToDirections path = [dir | (dir, _) <- path]
+
+-- Branch Nothing Empty (traverseTreeTable (Branch Nothing Empty Empty) xs val) 
+
+directionsToCode :: [Direction] -> [Atom]
+directionsToCode dirs = case dirs of
+    [] -> []
+    dirs -> case head dirs of
+        GoLeft -> dit ++ directionsToCode (tail dirs)
+        GoRight -> dah ++  directionsToCode (tail dirs)
+
+pathToCode :: Path a -> [Atom]
+pathToCode path = directionsToCode (pathToDirections path)
+
+
+-- go throught every node in the tree noting its directions
+-- when you get to a leaf add its value and the code corresponding to its directions to the table
+-- remove the leaf 
+-- repeat until the tree is empty
 
 {- Question 6 -}
 brackets :: Bracket -> String
