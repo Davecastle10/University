@@ -232,7 +232,7 @@ traverseTreeTable (Branch (Just char) Empty Empty) path table = (Empty, Path (ta
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
 traverseTreeTable (Branch Nothing left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
 traverseTreeTable (Branch Nothing Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
-traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table) ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
 
 {-}
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
@@ -240,10 +240,19 @@ traverseTreeTable (Branch Nothing left Empty) path table = traverseTreeTable lef
 traverseTreeTable (Branch Nothing Empty right) path table = traverseTreeTable right path table
 traverseTreeTable (Branch Nothing left right) path table = traverseTreeTable left path table
 -}
+
+{-}
+-- most recent
 traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
 traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
 traverseTreeTable (Branch (Just char) left right) path table = (Branch (Just char) Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
+-}
 
+traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) left right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table) ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
+
+-- 36 36
 {-}
 traverseTreeTable (Branch value left right) [] val = (Branch val left right)
 traverseTreeTable (Branch value left right) (GoLeft:xs) val = Branch value (traverseTreeTable left xs val) right
@@ -264,12 +273,12 @@ pathToDirections (Path dirs) = [dir | (dir, _) <- dirs]
 
 -- Branch Nothing Empty (traverseTreeTable (Branch Nothing Empty Empty) xs val) 
 
-directionsToCode :: [Direction] -> [Atom]
+directionsToCode :: [Direction] -> [Atom] -- puts the direction in reverse order because that is how htye are represented in the Path
 directionsToCode dirs = case dirs of
     [] -> []
     dirs -> case head dirs of
-        GoLeft -> dit ++ directionsToCode (tail dirs)
-        GoRight -> dah ++  directionsToCode (tail dirs)
+        GoLeft -> directionsToCode (tail dirs) ++ dit
+        GoRight -> directionsToCode (tail dirs) ++ dah
 
 pathToCode :: Path a -> Code
 pathToCode path = directionsToCode (pathToDirections path)
