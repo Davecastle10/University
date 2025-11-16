@@ -111,9 +111,48 @@ decodeText morseTable codeIn = retString
         retString = intercalate " " decodedLetterWords
         -- now just need to go through and connect the list of list of char into list of char ++ space ++ list of char etc to make a decode string
 
+
+
+
+reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
+reverseLookup codeIn tableIn
+    | null tableIn = Nothing
+    | not (not (any (\(_, b) -> b == codeIn) tableIn)) = Just (fst (head (filter (\(a, b) -> b == codeIn) tableIn)))
+    | otherwise = Nothing
+
+
+
+-- head (filter (\x -> snd x == codeIn) tableIn)))
+
+
+{- Question 3 -}
+
+morseTree = Branch Nothing (Branch (Just 'E') (Branch (Just 'I') (Branch (Just 'S') (Branch (Just 'H') (Branch (Just '5') Empty Empty) (Branch (Just '4') Empty Empty)) (Branch (Just 'V') Empty (Branch (Just '3') Empty Empty))) (Branch (Just 'U') (Branch (Just 'F') Empty Empty) (Branch Nothing Empty (Branch (Just '2') Empty Empty)))) (Branch (Just 'A') (Branch (Just 'R') (Branch (Just 'L') Empty Empty) Empty) (Branch (Just 'W') (Branch (Just 'P') Empty Empty) (Branch (Just 'J') Empty (Branch (Just '1') Empty Empty))))) (Branch (Just 'T') (Branch (Just 'N') (Branch (Just 'D') (Branch (Just 'B') (Branch (Just '6') Empty Empty) Empty) (Branch (Just 'X') Empty Empty)) (Branch (Just 'K') (Branch (Just 'C') Empty Empty) (Branch (Just 'Y') Empty Empty))) (Branch (Just 'M') (Branch (Just 'G') (Branch (Just 'Z') (Branch (Just '7') Empty Empty) Empty) (Branch (Just 'Q') Empty Empty)) (Branch (Just 'O') (Branch Nothing (Branch (Just '8') Empty Empty) Empty) (Branch Nothing (Branch (Just '9') Empty Empty) (Branch (Just '0') Empty Empty)))))
+
+
+decodeTextWithTree :: Tree -> Code -> [[[Direction]]]
+decodeTextWithTree treeIn codeIn = codeToDirections codeIn
+    where
+        words = splitGap (mediumGap ++ [Silence]) codeIn
+        letterWords = [splitGap (shortGap ++ [Silence]) x | x <- words]
+        directionList = codeToDirections codeIn -- of from [[[GoLeft,GoRight], [GoRight]], [[GoLeft], [GoRight]]]
+
+-- need to go left with dit and rigth with dah, then you will be at the node wit the encode value once you have done all the dit/dah's for the letter.
+
+
+
+codeToDirections :: Code -> [[[Direction]]]
+codeToDirections code = retDirections
+    where
+        words = splitGap (mediumGap ++ [Silence]) code
+        letterWords = [ splitGap (shortGap ++ [Silence]) x | x <- words]
+
+        retDirections = [[ditdahSplit x | x <- xs] | xs <- letterWords]
+        -- now just need to go through and connect the list of list of char into list of char ++ space ++ list of char etc to make a decode string
+
+
+
 data Direction = GoLeft | GoRight deriving (Show, Eq)
-
-
 -- convert a code to a list of directions
 ditdahSplit :: [Atom] -> [Direction]
 ditdahSplit code = case code of 
@@ -136,31 +175,6 @@ getCode str
     | str == "dah" = [Beep, Beep, Beep, Silence]
     | otherwise = []
 
-
-
-reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
-reverseLookup codeIn tableIn
-    | null tableIn = Nothing
-    | not (not (any (\(_, b) -> b == codeIn) tableIn)) = Just (fst (head (filter (\(a, b) -> b == codeIn) tableIn)))
-    | otherwise = Nothing
-
-
-
--- head (filter (\x -> snd x == codeIn) tableIn)))
-
-
-{- Question 3 -}
-
--- let morseTree = Branch Nothing (Branch (Just 'E') (Branch (Just 'I') (Branch (Just 'S') (Branch (Just 'H') (Branch (Just '5') Empty Empty) (Branch (Just '4') Empty Empty)) (Branch (Just 'V') Empty (Branch (Just '3') Empty Empty))) (Branch (Just 'U') (Branch (Just 'F') Empty Empty) (Branch Nothing Empty (Branch (Just '2') Empty Empty)))) (Branch (Just 'A') (Branch (Just 'R') (Branch (Just 'L') Empty Empty) Empty) (Branch (Just 'W') (Branch (Just 'P') Empty Empty) (Branch (Just 'J') Empty (Branch (Just '1') Empty Empty))))) (Branch (Just 'T') (Branch (Just 'N') (Branch (Just 'D') (Branch (Just 'B') (Branch (Just '6') Empty Empty) Empty) (Branch (Just 'X') Empty Empty)) (Branch (Just 'K') (Branch (Just 'C') Empty Empty) (Branch (Just 'Y') Empty Empty))) (Branch (Just 'M') (Branch (Just 'G') (Branch (Just 'Z') (Branch (Just '7') Empty Empty) Empty) (Branch (Just 'Q') Empty Empty)) (Branch (Just 'O') (Branch Nothing (Branch (Just '8') Empty Empty) Empty) (Branch Nothing (Branch (Just '9') Empty Empty) (Branch (Just '0') Empty Empty)))))
-
-
-decodeTextWithTree :: Tree -> Code -> [[[Atom]]]
-decodeTextWithTree treeIn codeIn = letterWords
-    where
-        words = splitGap (mediumGap ++ [Silence]) codeIn
-        letterWords = [splitGap (shortGap ++ [Silence]) x | x <- words]
-
--- need to go left with dit and rigth with dah, then you will be at the node wit the encode value once you have done all the dit/dah's for the letter.
 
 {- Question 4 -}
 ramify :: Table -> Tree
