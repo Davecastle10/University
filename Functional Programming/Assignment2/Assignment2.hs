@@ -192,7 +192,7 @@ ramify table = updateTree retTree table
 updateTree :: Tree -> Table -> Tree
 updateTree tree table = foldl update tree (directionsTable table)
     where
-        update treee (Just character, directions) = traverseTableTree treee directions (Just character)
+        update treee (character, directions) = traverseTableTree treee directions (character)
 
 
 -- not sure if actually need this anymore
