@@ -185,7 +185,29 @@ getCode str
 
 {- Question 4 -}
 ramify :: Table -> Tree
-ramify = undefined
+ramify table = undefined
+    where
+        retTree :: Tree
+        retTree = Branch Nothing Empty Empty
+        driectionsTable = [ (c , ditdahSplit b) | (c, b) <-  table]
+
+
+-- not sure if actually need this anymore
+directionsTable :: Table -> [(Char, [Direction])] -- make a version of the table that is list of pairs pf value and the direction to it's node
+directionsTable table = [ (c , ditdahSplit b) | (c, b) <-  table]
+
+-- use code to directions to take the code for each char in the table to get the directions to it's position as a node
+-- traverse the tree if a node in your path doesnt exist make it woth Nothing as its value
+-- when you get to your final position crate a node with your Value or if it alread exists update the value
+
+-- traverse the tree for a specific value in the table
+traverseTableTree :: Tree -> [Direction] -> Maybe Char -> Tree
+traverseTableTree Empty [] val = Branch val Empty Empty
+traverseTableTree Empty (GoLeft:xs) val = Branch Nothing (traverseTableTree (Branch Nothing Empty Empty) xs val) Empty
+traverseTableTree Empty (GoRight:xs) val = Branch Nothing Empty (traverseTableTree (Branch Nothing Empty Empty) xs val) 
+traverseTableTree (Branch value left right) [] val = (Branch val left right)
+traverseTableTree (Branch _ left right) (GoLeft:xs) val = traverseTableTree left xs val
+traverseTableTree (Branch _ left right) (GoRight:xs) val = traverseTableTree right xs val
 
 {- Question 5 -}
 tabulate :: Tree -> Table
