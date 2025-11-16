@@ -14,6 +14,7 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
+import Data.ByteString.Char8 (unwords)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -108,7 +109,7 @@ decodeText morseTable codeIn = retString
         -- letterWords = map split (shortGap ++ [Silence]) words
         letterWords = [ splitGap (shortGap ++ [Silence]) x | x <- words]
         decodedLetterWords = [ [ unMaybe (reverseLookup x morseTable) | x <- xs] | xs <- letterWords]
-        retString = intercalate " " decodedLetterWords
+        retString = unwords decodedLetterWords
         -- now just need to go through and connect the list of list of char into list of char ++ space ++ list of char etc to make a decode string
 
 
