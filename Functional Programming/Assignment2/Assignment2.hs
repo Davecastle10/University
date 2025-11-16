@@ -137,9 +137,14 @@ decodeTextWithTree treeIn codeIn = codeToDirections codeIn
         letterWords = [splitGap (shortGap ++ [Silence]) x | x <- words]
         directionList = codeToDirections codeIn -- of from [[[GoLeft,GoRight], [GoRight]], [[GoLeft], [GoRight]]]
 
+
 -- need to go left with dit and rigth with dah, then you will be at the node wit the encode value once you have done all the dit/dah's for the letter.
 
-
+traverseTree :: Tree -> [Direction] -> Maybe Char
+traverseTree Empty _ = Nothing
+traverseTree (Branch value left right) [] = value
+traverseTree (Branch _ left right) (GoLeft:xs) = traverseTree left xs
+traverseTree (Branch _ left right) (GoRight:xs) = traverseTree right xs
 
 codeToDirections :: Code -> [[[Direction]]]
 codeToDirections code = retDirections
