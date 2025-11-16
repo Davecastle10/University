@@ -1,5 +1,8 @@
-import Data.List
 
+import Types
+import Data.List
+import GHC.Exts.Heap (StgInfoTable(code))
+import Distribution.Compat.CharParsing (CharParsing(string))
 test1 = [[1,2,3],[2,3,4]]
 
 split :: Eq a => [a] -> [a] -> [[a]]
@@ -9,3 +12,44 @@ split delim xs = filter (not . null) (splitHelper xs)
     splitHelper ys@(y:ys') -- make ys into y (the head of ys) and ys' the rest of ys the @ symbol usage is really cool, it makes this sort of stuff way eaier
       | delim `isPrefixOf` ys = [] : splitHelper (drop (length delim) ys) -- if the deliminator is the prefix of ys the drop it and call the function again
       | otherwise = let (h:t) = splitHelper ys' in (y:h) : t -- calls split helper recursively on the tail of ys then recmobines as it backtracks throught the recursive call
+
+testList = [Beep,Silence,Beep,Beep,Beep,Silence,Beep,Silence,Beep,Silence]
+
+data Direction = GoLeft | GoRight deriving (Show, Eq)
+
+-- error "it's dah propaganda you get me"
+-- convert a code to a list of directions
+ditdahSplit :: [Atom] -> [Direction]
+ditdahSplit code = case code of 
+    [] -> [] -- emoty code
+    code -> case matchCode'' code of -- non empty code
+        Just signal -> (if signal == "dit" then GoLeft else GoRight) : ditdahSplit (drop (length (getCode signal)) code) -- if the driection
+        Nothing -> ditdahSplit (tail code)
+
+
+matchCode :: [Atom] -> Maybe String
+matchCode code -- this not working
+    | code == dit = Just "dit"
+    | code == dah = Just "dah"
+    | otherwise = Just "Nothing"
+
+{-}
+matchCode' :: [Atom] -> Maybe String
+matchCode' code@(x:y:z:xs)
+    | length code >= 2 = (if [x] ++ [y] == dit then Just "dit" else (if length code >= 3 then (if [x] ++ [y] ++ [z] == dah then Just "dit" else Nothing) else Nothing))
+    | otherwise = Nothing
+-}
+
+matchCode'' :: [Atom] -> Maybe String
+matchCode'' code
+    | length code >= 4 && take 4 code == dah = Just "dah"
+    | length code >= 2 && take 2 code == dit = Just "dit"
+    | otherwise = Nothing
+
+
+getCode :: String -> [Atom]
+getCode str
+    | str == "dit" = [Beep, Silence]
+    | str == "dah" = [Beep, Beep, Beep, Silence]
+    | otherwise = []
+

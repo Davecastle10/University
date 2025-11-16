@@ -14,7 +14,6 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
-import Types (morseTable)
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -28,7 +27,7 @@ unMaybe Nothing = error "Maybe propaganda"
 encodeWord :: Table -> String -> Code
 encodeWord tableIn xs = take (retCodeLength - 2) retCode
     where
-        retCode = concat [case lookup x tableIn of 
+        retCode = concat [case lookup x tableIn of
                                         Just code -> code ++ [Silence,Silence]
                                         Nothing -> [] | x <- xs] -- i don't like the way this looks but also don't want to add another function will will slow down code
         retCodeLength = length retCode
@@ -41,7 +40,7 @@ encodeWord tableIn xs = take (retCodeLength - 2) retCode
 -}
 
 encodeWords :: Table -> [String] -> Code
-encodeWords tableIn xs 
+encodeWords tableIn xs
     | null xs = []
     | otherwise = take (codeListLength - 6) codeList
     -- | otherwise = codeList
@@ -57,8 +56,8 @@ split delim xs = case break (==delim) xs of
 -}
 
 
-splitComma :: [Char] -> [[Char]] 
-splitComma xs = case break (==',') xs of 
+splitComma :: [Char] -> [[Char]]
+splitComma xs = case break (==',') xs of
     (front, []) -> [front] -- there is no seperatror in the list/string/whatever so just return the front = whole list
     (front, rest) -> [front] ++ splitComma (drop 1 rest) -- migth not need the [] around front here if the base case when nothing left sorts it out, but test later.
 
@@ -105,18 +104,44 @@ decodeText :: Table -> Code -> String
 decodeText morseTable codeIn = retString
     where
         -- words = [ x ++ [Silence]| x <- split (mediumGap ++ [Silence]) codeIn] -- ws going to remove all seven silences and then add backe to end of each word but think can get round this
-        words = [ x | x <- splitGap (mediumGap ++ [Silence]) codeIn] 
+        words = splitGap (mediumGap ++ [Silence]) codeIn
         -- letterWords = map split (shortGap ++ [Silence]) words
         letterWords = [ splitGap (shortGap ++ [Silence]) x | x <- words]
         decodedLetterWords = [ [ unMaybe (reverseLookup x morseTable) | x <- xs] | xs <- letterWords]
         retString = intercalate " " decodedLetterWords
         -- now just need to go through and connect the list of list of char into list of char ++ space ++ list of char etc to make a decode string
 
+data Direction = GoLeft | GoRight deriving (Show, Eq)
+
+
+-- convert a code to a list of directions
+ditdahSplit :: [Atom] -> [Direction]
+ditdahSplit code = case code of 
+    [] -> [] -- emoty code
+    code -> case matchCode'' code of -- non empty code
+        Just signal -> (if signal == "dit" then GoLeft else GoRight) : ditdahSplit (drop (length (getCode signal)) code) -- if the driection
+        Nothing -> ditdahSplit (tail code)
+
+
+matchCode'' :: [Atom] -> Maybe String -- check if the first part of a code is s dit or a dah
+matchCode'' code
+    | length code >= 4 && take 4 code == dah = Just "dah"
+    | length code >= 2 && take 2 code == dit = Just "dit"
+    | otherwise = Nothing
+
+
+getCode :: String -> [Atom]
+getCode str
+    | str == "dit" = [Beep, Silence]
+    | str == "dah" = [Beep, Beep, Beep, Silence]
+    | otherwise = []
+
+
 
 reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
 reverseLookup codeIn tableIn
     | null tableIn = Nothing
-    | not (null (filter (\(_, b) -> b == codeIn) tableIn)) = Just (fst (head (filter (\(a, b) -> b == codeIn) tableIn)))
+    | not (not (any (\(_, b) -> b == codeIn) tableIn)) = Just (fst (head (filter (\(a, b) -> b == codeIn) tableIn)))
     | otherwise = Nothing
 
 
@@ -126,11 +151,16 @@ reverseLookup codeIn tableIn
 
 {- Question 3 -}
 
-let morseTree = Branch Nothing (Branch (Just 'E') (Branch (Just 'I') (Branch (Just 'S') (Branch (Just 'H') (Branch (Just '5') Empty Empty) (Branch (Just '4') Empty Empty)) (Branch (Just 'V') Empty (Branch (Just '3') Empty Empty))) (Branch (Just 'U') (Branch (Just 'F') Empty Empty) (Branch Nothing Empty (Branch (Just '2') Empty Empty)))) (Branch (Just 'A') (Branch (Just 'R') (Branch (Just 'L') Empty Empty) Empty) (Branch (Just 'W') (Branch (Just 'P') Empty Empty) (Branch (Just 'J') Empty (Branch (Just '1') Empty Empty))))) (Branch (Just 'T') (Branch (Just 'N') (Branch (Just 'D') (Branch (Just 'B') (Branch (Just '6') Empty Empty) Empty) (Branch (Just 'X') Empty Empty)) (Branch (Just 'K') (Branch (Just 'C') Empty Empty) (Branch (Just 'Y') Empty Empty))) (Branch (Just 'M') (Branch (Just 'G') (Branch (Just 'Z') (Branch (Just '7') Empty Empty) Empty) (Branch (Just 'Q') Empty Empty)) (Branch (Just 'O') (Branch Nothing (Branch (Just '8') Empty Empty) Empty) (Branch Nothing (Branch (Just '9') Empty Empty) (Branch (Just '0') Empty Empty)))))
+-- let morseTree = Branch Nothing (Branch (Just 'E') (Branch (Just 'I') (Branch (Just 'S') (Branch (Just 'H') (Branch (Just '5') Empty Empty) (Branch (Just '4') Empty Empty)) (Branch (Just 'V') Empty (Branch (Just '3') Empty Empty))) (Branch (Just 'U') (Branch (Just 'F') Empty Empty) (Branch Nothing Empty (Branch (Just '2') Empty Empty)))) (Branch (Just 'A') (Branch (Just 'R') (Branch (Just 'L') Empty Empty) Empty) (Branch (Just 'W') (Branch (Just 'P') Empty Empty) (Branch (Just 'J') Empty (Branch (Just '1') Empty Empty))))) (Branch (Just 'T') (Branch (Just 'N') (Branch (Just 'D') (Branch (Just 'B') (Branch (Just '6') Empty Empty) Empty) (Branch (Just 'X') Empty Empty)) (Branch (Just 'K') (Branch (Just 'C') Empty Empty) (Branch (Just 'Y') Empty Empty))) (Branch (Just 'M') (Branch (Just 'G') (Branch (Just 'Z') (Branch (Just '7') Empty Empty) Empty) (Branch (Just 'Q') Empty Empty)) (Branch (Just 'O') (Branch Nothing (Branch (Just '8') Empty Empty) Empty) (Branch Nothing (Branch (Just '9') Empty Empty) (Branch (Just '0') Empty Empty)))))
 
 
-decodeTextWithTree :: Tree -> Code -> String
-decodeTextWithTree = undefined
+decodeTextWithTree :: Tree -> Code -> [[[Atom]]]
+decodeTextWithTree treeIn codeIn = letterWords
+    where
+        words = splitGap (mediumGap ++ [Silence]) codeIn
+        letterWords = [splitGap (shortGap ++ [Silence]) x | x <- words]
+
+-- need to go left with dit and rigth with dah, then you will be at the node wit the encode value once you have done all the dit/dah's for the letter.
 
 {- Question 4 -}
 ramify :: Table -> Tree
