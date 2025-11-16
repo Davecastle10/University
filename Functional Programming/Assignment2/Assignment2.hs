@@ -185,16 +185,19 @@ getCode str
 
 {- Question 4 -}
 ramify :: Table -> Tree
-ramify table = undefined
+ramify table = updateTree retTree table
     where
-        retTree :: Tree
         retTree = Branch Nothing Empty Empty
-        driectionsTable = [ (c , ditdahSplit b) | (c, b) <-  table]
+
+updateTree :: Tree -> Table -> Tree
+updateTree tree table = foldl update tree (directionsTable table)
+    where
+        update treee (Just character, directions) = traverseTableTree treee directions (Just character)
 
 
 -- not sure if actually need this anymore
-directionsTable :: Table -> [(Char, [Direction])] -- make a version of the table that is list of pairs pf value and the direction to it's node
-directionsTable table = [ (c , ditdahSplit b) | (c, b) <-  table]
+directionsTable :: Table -> [(Maybe Char, [Direction])] -- make a version of the table that is list of pairs pf value and the direction to it's node
+directionsTable table = [ (Just c , ditdahSplit b) | (c, b) <-  table]
 
 -- use code to directions to take the code for each char in the table to get the directions to it's position as a node
 -- traverse the tree if a node in your path doesnt exist make it woth Nothing as its value
@@ -206,8 +209,8 @@ traverseTableTree Empty [] val = Branch val Empty Empty
 traverseTableTree Empty (GoLeft:xs) val = Branch Nothing (traverseTableTree (Branch Nothing Empty Empty) xs val) Empty
 traverseTableTree Empty (GoRight:xs) val = Branch Nothing Empty (traverseTableTree (Branch Nothing Empty Empty) xs val) 
 traverseTableTree (Branch value left right) [] val = (Branch val left right)
-traverseTableTree (Branch _ left right) (GoLeft:xs) val = traverseTableTree left xs val
-traverseTableTree (Branch _ left right) (GoRight:xs) val = traverseTableTree right xs val
+traverseTableTree (Branch value left right) (GoLeft:xs) val = Branch value (traverseTableTree left xs val) right
+traverseTableTree (Branch value left right) (GoRight:xs) val = Branch value left (traverseTableTree right xs val)
 
 {- Question 5 -}
 tabulate :: Tree -> Table
