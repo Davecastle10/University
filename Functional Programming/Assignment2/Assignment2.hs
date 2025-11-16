@@ -213,19 +213,20 @@ traverseTableTree (Branch value left right) (GoRight:xs) val = Branch value left
 
 {- Question 5 -}
 tabulate :: Tree -> Table
-tabulate treeIn = getTable (traverseTableTree treeIn startPath retTable)
+tabulate treeIn = getTable (traverseTreeTable treeIn startPath retTable)
     where
         retTable :: Table
-        startPath :: Path
-        startPath = Empty
+        retTable = []
+        startPath :: Path Char
+        startPath = EmptyPath
 
-data Path a = Empty | Path [(Direction, a)] deriving (Show, Eq)
+data Path a = EmptyPath | Path [(Direction, a)] deriving (Show, Eq)
 
 traverseTreeTable :: Tree -> Path Char -> Table -> (Tree, Path Char, Table)
 traverseTreeTable Empty path table  = (Empty, path, table)
-traverseTreeTable (Branch (Just char) Empty Empty) path table = (Empty, tail path, (char, pathToCode path))
-traverseTreeTable (Branch (Just char) left _) path table = traverseTreeTable left ((GoLeft, char) : path) table
-traverseTreeTable (Branch (Just char) Empty right) path table = traverseTreeTable right ((GoRight, char) : path) table
+traverseTreeTable (Branch (Just char) Empty Empty) path@(Path dirs) table = (Empty, Path (tail dirs), (char, pathToCode path) : table )
+traverseTreeTable (Branch (Just char) left _) path@(Path dirs) table = traverseTreeTable left (Path ((GoLeft, char) : dirs)) table
+traverseTreeTable (Branch (Just char) Empty right) path@(Path dirs) table = traverseTreeTable right (Path ((GoRight, char) : dirs)) table
 {-}
 traverseTreeTable (Branch value left right) [] val = (Branch val left right)
 traverseTreeTable (Branch value left right) (GoLeft:xs) val = Branch value (traverseTreeTable left xs val) right
@@ -237,7 +238,7 @@ getTable (x, y, z) = z
 
 
 pathToDirections :: Path a -> [Direction]
-pathToDirections path = [dir | (dir, _) <- path]
+pathToDirections (Path dirs) = [dir | (dir, _) <- dirs]
 
 -- Branch Nothing Empty (traverseTreeTable (Branch Nothing Empty Empty) xs val) 
 
@@ -248,7 +249,7 @@ directionsToCode dirs = case dirs of
         GoLeft -> dit ++ directionsToCode (tail dirs)
         GoRight -> dah ++  directionsToCode (tail dirs)
 
-pathToCode :: Path a -> [Atom]
+pathToCode :: Path a -> Code
 pathToCode path = directionsToCode (pathToDirections path)
 
 
