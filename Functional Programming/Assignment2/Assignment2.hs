@@ -309,36 +309,60 @@ parse [] _ _ = Nothing
 parse string@(x : xs) depthRound depthCurly
     | x == '(' = parseInner xs (depthRound + 1) depthCurly [] Round -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
     | x == '{' = parseInner xs depthRound (depthCurly + 1) [] Curly -- above but for the curly fun ones
+    | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket   error "test3" --
+    | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones    error "test4" --
+    | x == ')' || x == '}' =  Nothing  -- Invalibad closing bracket
+    | otherwise = Nothing  -- bad  character
+
+-- Inner parsing loop to gather elements
+parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
+parseInner [] _ _ _ _ = Nothing -- this line ande the final line are the issues -- think fixed
+parseInner xs depthRound depthCurly brackets constructor
+    | length xs == 1 = parse xs depthRound depthCurly -- 
+    | otherwise =   case parse' xs depthRound depthCurly of
+                        -- Nothing -> Just (constructor (reverse brackets), length xs) -- Nothing -- Construct final bracket 
+                        Nothing -> helper xs depthRound depthCurly brackets constructor -- error "test5" --
+                        Just (Round rs, n) ->  parseInner (drop n xs) (depthRound - 1) depthCurly (Round  rs: brackets) constructor -- error "test" --
+                        Just (Curly cs, n) -> parseInner (drop n xs) depthRound (depthCurly - 1) (Curly cs : brackets) constructor -- error "test2" --
+    where
+        helper :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
+        helper [] _ _ _ _  = Nothing
+        helper (x:xs) depthRound depthCurly brackets constructor
+            | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
+            | x == ')' && depthRound < 1 =  Nothing
+            | x == '}' && depthCurly < 1 =  Nothing
+            | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
+            | otherwise = Nothing
+
+parse' :: String -> Int -> Int ->  Maybe (Bracket, Int)
+parse' [] _ _ = Nothing
+parse' string@(x : xs) depthRound depthCurly
+    | x == '(' = Just (Round [], 1) -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
+    | x == '{' = Just (Curly [], 1) -- above but for the curly fun ones
     | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket
     | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
     | x == ')' || x == '}' =  Nothing  -- Invalibad closing bracket
     | otherwise = Nothing  -- bad  character
 
-{-}
-    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
-    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
--}
+-- ({})
+-- parseInner "{})" 1 0 [] Round
+    -- parse "{})" 1 0 -> parseInner "})" 1 1 [] Curly
+        -- parse "})" 1 1 -> Just (Curly [], 1)
+    -- parseInner ("})") 1 0 [Curly []] Round
+        -- parse "})" 1 0 -> Just (Curly [], 1)
+        -- parseInner ")" 1 0 [Curly []] Round
+            -- parse ")" 1 0 -> Just (Round [], 1)
 
--- Inner parsing loop to gather elements
-parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
-parseInner [] _ _ _ _ = error ("depth") --Nothing -- this line ande the final line are the issues
-parseInner xs depthRound depthCurly brackets constructor =
-    case parse xs depthRound depthCurly of
-        Nothing -> Nothing -- Just (constructor (reverse brackets), length xs)  -- Construct final bracket 
-        -- migth need to start from scratch
-        Just (b, n) -> parseInner (drop n xs) depthRound depthCurly (b : brackets) constructor -- 
+
+-- {})
+-- parseInner "})" 1 1 [] Round
+-- cas parse "})"  1 1 -> Just (Curly [], 1)
+    -- parseInner ")" 1 1 [Curly []]
 
 -- not work because run parse, find '('
 -- then call parse inner on ')' with depthRound 1
--- then parse inner does parse again which returns Just (ROund [], 1)
+-- then parse inner does parse again which returns Just (Round [], 1)
 -- which means it calls parseInner again but drops 1 from xs, so is calling on empty list, so returns Nothing
-
-
-
-
--- statring again
-
-
 
 
 -- need to iterate through string counting up the brackets and then break into sub trees
