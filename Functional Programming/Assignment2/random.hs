@@ -1,8 +1,6 @@
 
 import Types
 import Data.List
-import GHC.Exts.Heap (StgInfoTable(code))
-import Distribution.Compat.CharParsing (CharParsing(string))
 test1 = [[1,2,3],[2,3,4]]
 
 split :: Eq a => [a] -> [a] -> [[a]]
@@ -52,4 +50,47 @@ getCode str
     | str == "dit" = [Beep, Silence]
     | str == "dah" = [Beep, Beep, Beep, Silence]
     | otherwise = []
+
+
+
+
+stringTest :: String -> Char
+stringTest string = last string
+
+
+-- bad code banished to the random realm
+
+tree :: String -> Maybe Bracket
+tree xs = case parse xs 0 of
+    Just (bracket, _) -> Just bracket   -- Return the parsed Bracket, ignoring the Int
+    Nothing          -> Nothing          -- Return Nothing if parsing fails
+
+
+-- doesnt work cause it thinks tree "(()" is valid
+
+parse :: String -> Int ->  Maybe (Bracket, Int)
+parse [] _ = Nothing
+parse (')':_) _ = Nothing
+parse ('}':_) _ = Nothing
+parse string@(x : xs) depth
+    | x == '(' = parseInner xs (depth + 1) [] Round -- parse the inner part of the function wehn staring with round brakcets
+    | x == '{' = parseInner xs (depth + 1) [] Curly -- above but for the curly fun ones
+    | x == ')' && depth > 0 = Just (Round [], 1)  -- case for cloasing losing Round bracket
+    | x == '}' && depth > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
+    | x == ')' || x == '}' = Nothing  -- Invalibad closing bracket
+    | otherwise = Nothing  -- bad  character
+
+{-}
+    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
+    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
+-}
+
+-- Inner parsing loop to gather elements
+parseInner :: String -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
+parseInner [] _ _ _ = Nothing
+parseInner xs depth brackets constructor =
+    case parse xs depth of
+        Nothing -> Just (constructor (reverse brackets), length xs)  -- Construct final bracket -- its this line that isn't rigth, cause of the way it handles nothing
+        -- migth need to start from scratch
+        Just (b, n) -> parseInner (drop n xs) depth (b : brackets) constructor
 

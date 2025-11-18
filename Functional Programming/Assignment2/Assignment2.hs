@@ -206,7 +206,7 @@ directionsTable table = [ (Just c , ditdahSplit b) | (c, b) <-  table]
 traverseTableTree :: Tree -> [Direction] -> Maybe Char -> Tree
 traverseTableTree Empty [] val = Branch val Empty Empty
 traverseTableTree Empty (GoLeft:xs) val = Branch Nothing (traverseTableTree (Branch Nothing Empty Empty) xs val) Empty
-traverseTableTree Empty (GoRight:xs) val = Branch Nothing Empty (traverseTableTree (Branch Nothing Empty Empty) xs val) 
+traverseTableTree Empty (GoRight:xs) val = Branch Nothing Empty (traverseTableTree (Branch Nothing Empty Empty) xs val)
 traverseTableTree (Branch value left right) [] val = (Branch val left right)
 traverseTableTree (Branch value left right) (GoLeft:xs) val = Branch value (traverseTableTree left xs val) right
 traverseTableTree (Branch value left right) (GoRight:xs) val = Branch value left (traverseTableTree right xs val)
@@ -230,9 +230,9 @@ traverseTreeTable (Branch (Just char) Empty Empty) path table = (Empty, Path (ta
 
 
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
-traverseTreeTable (Branch Nothing left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
-traverseTreeTable (Branch Nothing Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
-traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table) ++ getTable(traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing left Empty) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable (traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing Empty right) path table = (Empty, Path (tail (pathGetDirs path)), table ++ getTable (traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
+traverseTreeTable (Branch Nothing left right) path table = (Branch Nothing Empty right, Path (tail (pathGetDirs path)), table ++ getTable (traverseTreeTable left (Path ((GoLeft, Nothing) : pathGetDirs path)) table) ++ getTable (traverseTreeTable right (Path ((GoRight, Nothing) : pathGetDirs path)) table))
 
 {-}
 traverseTreeTable (Branch Nothing Empty Empty) path table = (Empty, path, table)
@@ -248,9 +248,9 @@ traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, Path (ta
 traverseTreeTable (Branch (Just char) left right) path table = (Branch (Just char) Empty right, Path (tail (pathGetDirs path)), table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
 -}
 
-traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
-traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
-traverseTreeTable (Branch (Just char) left right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable(traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table) ++ getTable(traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) left Empty) path table = (Empty, path, (char, pathToCode path) : table ++ getTable (traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) Empty right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable (traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
+traverseTreeTable (Branch (Just char) left right) path table = (Empty, path, (char, pathToCode path) : table ++ getTable (traverseTreeTable left (Path ((GoLeft, Just char) : pathGetDirs path)) table) ++ getTable (traverseTreeTable right (Path ((GoRight, Just char) : pathGetDirs path)) table))
 
 -- 36 36
 {-}
@@ -295,7 +295,32 @@ brackets (Round ts) = "(" ++ concat [brackets t | t <- ts] ++ ")"
 brackets (Curly ts) = "{" ++ concat [brackets t | t <- ts] ++ "}"
 
 tree :: String -> Maybe Bracket
-tree = undefined
+tree string = parse string 0
+
+
+-- statring again
+
+parse :: String -> Int ->  Maybe Bracket
+parse [] _ = Nothing
+parse (')':_) _ = Nothing
+parse ('}':_) _ = Nothing
+pare string@(x : xs)
+    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
+    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
+    | otherwise = Nothing
+
+helperFuncRound :: String -> Int -> Bracket
+helperFuncRound = undefined
+
+helperFuncCurly :: String -> Int -> Bracket
+helperFuncCurly = undefined
+
+
+-- need to iterate through string counting up the brackets and then break into sub trees
+--      - need to make a helper function to split up the string into substrings
+--            - better if the sub function can be run int he recursive call in the tree function
+-- repeat recursivelly over the sub trees - it doesnt have to be binary amoun of sub trees
+-- recombine the Brakcet data type recursively
 
 isWellBracketed :: String -> Bool
 isWellBracketed xs = case tree xs of
