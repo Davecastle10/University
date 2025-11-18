@@ -303,9 +303,9 @@ tree xs = case parse xs 0 0 of
 
 -- doesnt work cause it thinks tree "(()" is valid
 
-parse :: String -> Int -> Int ->  Maybe (Bracket, Int)
+parse :: String -> Int -> Int ->  Maybe (Bracket, Int) -- there is an issue with recursion depth more than 3/4 i think
 parse [] _ _ = Nothing
-parse xs _ _ 
+parse xs _ _
     | xs == "()" = Just (Round [], 1)
     | xs == "{}" = Just (Curly [], 1)
 -- parse (')':_) _ _ = Nothing
@@ -327,8 +327,7 @@ parseInner xs depthRound depthCurly brackets constructor
                         -- Nothing -> Just (constructor (reverse brackets), length xs) -- Nothing -- Construct final bracket 
                         Nothing -> helper xs depthRound depthCurly brackets constructor -- error "test5" --
                         --Just (Round rs, n) ->  Just( fst (unMaybe (parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor)), n) -- error "test" --
-                        Just (Round rs, n) ->  parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor -- error "test" --
-                        
+                        Just (Round rs, n) -> parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor -- error "test" --
                         Just (Curly cs, n) -> parseInner (drop n xs) depthRound (depthCurly - 1) (Curly cs : brackets) constructor -- error "test2" --
     where
         helper :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int) -- this is the issue
@@ -339,6 +338,7 @@ parseInner xs depthRound depthCurly brackets constructor
             | x == '}' && depthCurly < 1 =  Nothing
             | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
             | otherwise = Nothing
+
 
 parse' :: String -> Int -> Int ->  Maybe (Bracket, Int)
 parse' [] _ _ = Nothing
@@ -358,6 +358,18 @@ parse' string@(x : xs) depthRound depthCurly
         -- parse "})" 1 0 -> Just (Curly [], 1)
         -- parseInner ")" 1 0 [Curly []] Round
             -- parse ")" 1 0 -> Just (Round [], 1)
+
+
+checkString :: String -> Int -> Int -> Int -> Int -> Bool
+checkString [] 0 0 0 0 = False
+checkString string@(x:xs) numOpenRound numClosedRound numOpenCurly numClosedCurly
+    | null string && (numOpenRound - numClosedRound == 0) && (numOpenCurly - numClosedCurly == 0) = True
+    | null string = False
+    | x == '(' = checkString xs (numOpenRound + 1) numClosedRound numOpenCurly numClosedCurly
+    | x == ')' = checkString xs numOpenRound (numClosedRound + 1) numOpenCurly numClosedCurly
+    | x == '{' = checkString xs numOpenRound numClosedRound (numOpenCurly + 1) numClosedCurly
+    | x == '}' = checkString xs numOpenRound numClosedRound numOpenCurly (numClosedCurly + 1)
+    | otherwise = False
 
 
 -- {})
