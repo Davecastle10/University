@@ -14,6 +14,7 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
+import Data.Maybe
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -304,13 +305,16 @@ tree xs = case parse xs 0 0 of
 
 parse :: String -> Int -> Int ->  Maybe (Bracket, Int)
 parse [] _ _ = Nothing
+parse xs _ _ 
+    | xs == "()" = Just (Round [], 1)
+    | xs == "{}" = Just (Curly [], 1)
 -- parse (')':_) _ _ = Nothing
 -- parse ('}':_) _ _ = Nothing
 parse string@(x : xs) depthRound depthCurly
     | x == '(' = parseInner xs (depthRound + 1) depthCurly [] Round -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
     | x == '{' = parseInner xs depthRound (depthCurly + 1) [] Curly -- above but for the curly fun ones
-    | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket   error "test3" --
-    | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones    error "test4" --
+    -- | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket   error "test3" --
+    -- | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones    error "test4" --
     | x == ')' || x == '}' =  Nothing  -- Invalibad closing bracket
     | otherwise = Nothing  -- bad  character
 
@@ -319,16 +323,18 @@ parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> May
 parseInner [] _ _ _ _ = Nothing -- this line ande the final line are the issues -- think fixed
 parseInner xs depthRound depthCurly brackets constructor
     | length xs == 1 = parse xs depthRound depthCurly -- 
-    | otherwise =   case parse' xs depthRound depthCurly of
+    | otherwise =   case parse xs depthRound depthCurly of -- see if can fix this so doesn'tneed to return nothing whe want to terminate bracket
                         -- Nothing -> Just (constructor (reverse brackets), length xs) -- Nothing -- Construct final bracket 
                         Nothing -> helper xs depthRound depthCurly brackets constructor -- error "test5" --
-                        Just (Round rs, n) ->  parseInner (drop n xs) (depthRound - 1) depthCurly (Round  rs: brackets) constructor -- error "test" --
+                        --Just (Round rs, n) ->  Just( fst (unMaybe (parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor)), n) -- error "test" --
+                        Just (Round rs, n) ->  parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor -- error "test" --
+                        
                         Just (Curly cs, n) -> parseInner (drop n xs) depthRound (depthCurly - 1) (Curly cs : brackets) constructor -- error "test2" --
     where
-        helper :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
+        helper :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int) -- this is the issue
         helper [] _ _ _ _  = Nothing
         helper (x:xs) depthRound depthCurly brackets constructor
-            | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
+            | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs) -- this is the problem can't be nothing but by returning a bracket am adding stuff to the back unnescarily
             | x == ')' && depthRound < 1 =  Nothing
             | x == '}' && depthCurly < 1 =  Nothing
             | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
