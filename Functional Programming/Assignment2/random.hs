@@ -57,6 +57,26 @@ getCode str
 stringTest :: String -> Char
 stringTest string = last string
 
+-- t6 attempt 1
+
+tree :: String -> Maybe Bracket
+tree string = parse string 0
+
+parse :: String -> Int ->  Maybe Bracket
+parse [] _ = Nothing
+parse (')':_) _ = Nothing
+parse ('}':_) _ = Nothing
+pare string@(x : xs)
+    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
+    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
+    | otherwise = Nothing
+
+helperFuncRound :: String -> Int -> Bracket
+helperFuncRound = undefined
+
+helperFuncCurly :: String -> Int -> Bracket
+helperFuncCurly = undefined
+
 
 -- bad code banished to the random realm
 
@@ -73,7 +93,7 @@ parse [] _ = Nothing
 parse (')':_) _ = Nothing
 parse ('}':_) _ = Nothing
 parse string@(x : xs) depth
-    | x == '(' = parseInner xs (depth + 1) [] Round -- parse the inner part of the function wehn staring with round brakcets
+    | x == '(' = parseInner xs (depth + 1) [] Round -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
     | x == '{' = parseInner xs (depth + 1) [] Curly -- above but for the curly fun ones
     | x == ')' && depth > 0 = Just (Round [], 1)  -- case for cloasing losing Round bracket
     | x == '}' && depth > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
@@ -92,5 +112,5 @@ parseInner xs depth brackets constructor =
     case parse xs depth of
         Nothing -> Just (constructor (reverse brackets), length xs)  -- Construct final bracket -- its this line that isn't rigth, cause of the way it handles nothing
         -- migth need to start from scratch
-        Just (b, n) -> parseInner (drop n xs) depth (b : brackets) constructor
+        Just (b, n) -> parseInner (drop n xs) depth (b : brackets) constructor -- 
 

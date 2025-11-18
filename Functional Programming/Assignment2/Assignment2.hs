@@ -295,25 +295,50 @@ brackets (Round ts) = "(" ++ concat [brackets t | t <- ts] ++ ")"
 brackets (Curly ts) = "{" ++ concat [brackets t | t <- ts] ++ "}"
 
 tree :: String -> Maybe Bracket
-tree string = parse string 0
+tree xs = case parse xs 0 0 of
+    Just (bracket, _) -> Just bracket   -- Return the parsed Bracket, ignoring the Int
+    Nothing          -> Nothing          -- Return Nothing if parsing fails
+
+
+-- doesnt work cause it thinks tree "(()" is valid
+
+parse :: String -> Int -> Int ->  Maybe (Bracket, Int)
+parse [] _ _ = Nothing
+-- parse (')':_) _ _ = Nothing
+-- parse ('}':_) _ _ = Nothing
+parse string@(x : xs) depthRound depthCurly
+    | x == '(' = parseInner xs (depthRound + 1) depthCurly [] Round -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
+    | x == '{' = parseInner xs depthRound (depthCurly + 1) [] Curly -- above but for the curly fun ones
+    | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket
+    | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
+    | x == ')' || x == '}' =  Nothing  -- Invalibad closing bracket
+    | otherwise = Nothing  -- bad  character
+
+{-}
+    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
+    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
+-}
+
+-- Inner parsing loop to gather elements
+parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
+parseInner [] _ _ _ _ = error ("depth") --Nothing -- this line ande the final line are the issues
+parseInner xs depthRound depthCurly brackets constructor =
+    case parse xs depthRound depthCurly of
+        Nothing -> Nothing -- Just (constructor (reverse brackets), length xs)  -- Construct final bracket 
+        -- migth need to start from scratch
+        Just (b, n) -> parseInner (drop n xs) depthRound depthCurly (b : brackets) constructor -- 
+
+-- not work because run parse, find '('
+-- then call parse inner on ')' with depthRound 1
+-- then parse inner does parse again which returns Just (ROund [], 1)
+-- which means it calls parseInner again but drops 1 from xs, so is calling on empty list, so returns Nothing
+
+
 
 
 -- statring again
 
-parse :: String -> Int ->  Maybe Bracket
-parse [] _ = Nothing
-parse (')':_) _ = Nothing
-parse ('}':_) _ = Nothing
-pare string@(x : xs)
-    | x == '(' = Just (helperFuncRound (take (length xs -1) xs))
-    | x == '{' = Just (helperFuncCurly (take (length xs -1) xs))
-    | otherwise = Nothing
 
-helperFuncRound :: String -> Int -> Bracket
-helperFuncRound = undefined
-
-helperFuncCurly :: String -> Int -> Bracket
-helperFuncCurly = undefined
 
 
 -- need to iterate through string counting up the brackets and then break into sub trees
