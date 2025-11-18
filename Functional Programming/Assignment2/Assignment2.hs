@@ -14,7 +14,6 @@ module Assignment2 (encodeWord , encodeWords , encodeText ,
 
 import Types
 import Data.List
-import Data.Maybe
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -296,6 +295,8 @@ brackets (Round ts) = "(" ++ concat [brackets t | t <- ts] ++ ")"
 brackets (Curly ts) = "{" ++ concat [brackets t | t <- ts] ++ "}"
 
 tree :: String -> Maybe Bracket
+tree xs
+    | not (checkString xs 0 0 0 0) = Nothing
 tree xs = case parse xs 0 0 of
     Just (bracket, _) -> Just bracket   -- Return the parsed Bracket, ignoring the Int
     Nothing          -> Nothing          -- Return Nothing if parsing fails
@@ -323,7 +324,7 @@ parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> May
 parseInner [] _ _ _ _ = Nothing -- this line ande the final line are the issues -- think fixed
 parseInner xs depthRound depthCurly brackets constructor
     | length xs == 1 = parse xs depthRound depthCurly -- 
-    | otherwise =   case parse xs depthRound depthCurly of -- see if can fix this so doesn'tneed to return nothing whe want to terminate bracket
+    | otherwise =   case parse' xs depthRound depthCurly of -- see if can fix this so doesn'tneed to return nothing whe want to terminate bracket
                         -- Nothing -> Just (constructor (reverse brackets), length xs) -- Nothing -- Construct final bracket 
                         Nothing -> helper xs depthRound depthCurly brackets constructor -- error "test5" --
                         --Just (Round rs, n) ->  Just( fst (unMaybe (parseInner (drop n xs) (depthRound - 1) depthCurly (Round rs : brackets) constructor)), n) -- error "test" --
@@ -334,19 +335,21 @@ parseInner xs depthRound depthCurly brackets constructor
         helper [] _ _ _ _  = Nothing
         helper (x:xs) depthRound depthCurly brackets constructor
             | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs) -- this is the problem can't be nothing but by returning a bracket am adding stuff to the back unnescarily
-            | x == ')' && depthRound < 1 =  Nothing
-            | x == '}' && depthCurly < 1 =  Nothing
-            | x == ')' || x == '}' =  Just (constructor (reverse brackets), length xs)
+            | x == ')' && depthRound == 0 =  Nothing
+            | x == '}' && depthCurly == 0 =  Nothing
             | otherwise = Nothing
 
 
 parse' :: String -> Int -> Int ->  Maybe (Bracket, Int)
 parse' [] _ _ = Nothing
+parse' xs _ _
+    | xs == "()" = Just (Round [], 1)
+    | xs == "{}" = Just (Curly [], 1)
 parse' string@(x : xs) depthRound depthCurly
-    | x == '(' = Just (Round [], 1) -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
-    | x == '{' = Just (Curly [], 1) -- above but for the curly fun ones
-    | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket
-    | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
+    | x == '(' = parseInner xs (depthRound + 1) depthCurly [] Round -- parse the inner part of the function wehn staring with round brakcets and increase the depth to show tht another round bracket has been found that needs to be mathced
+    | x == '{' = parseInner xs depthRound (depthCurly + 1) [] Curly -- above but for the curly fun ones
+    -- | x == ')' && depthRound > 0 =  Just (Round [], 1)  -- case for cloasing losing Round bracket
+    -- | x == '}' && depthCurly > 0 = Just (Curly [], 1)  -- above but for the curly fun ones
     | x == ')' || x == '}' =  Nothing  -- Invalibad closing bracket
     | otherwise = Nothing  -- bad  character
 
@@ -361,7 +364,10 @@ parse' string@(x : xs) depthRound depthCurly
 
 
 checkString :: String -> Int -> Int -> Int -> Int -> Bool
-checkString [] 0 0 0 0 = False
+checkString [] numOpenRound numClosedRound numOpenCurly numClosedCurly = numOpenRound == numClosedRound && numOpenCurly == numClosedCurly
+checkString string@(x:y:xs) numOpenRound numClosedRound numOpenCurly numClosedCurly
+    | length string > 1 && take 2 string == "{)" = False
+    | length string > 1 && take 2 string == "(}" = False
 checkString string@(x:xs) numOpenRound numClosedRound numOpenCurly numClosedCurly
     | null string && (numOpenRound - numClosedRound == 0) && (numOpenCurly - numClosedCurly == 0) = True
     | null string = False
