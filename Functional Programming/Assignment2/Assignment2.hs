@@ -320,6 +320,9 @@ parse string@(x : xs) depthRound depthCurly
     | otherwise = Nothing  -- bad  character
 
 -- Inner parsing loop to gather elements
+
+-- still can't fix the issue with it appending more Brackets [] to the end of a completee tree even with using erros to step throught the code and find where ti fails
+-- would require mostly complete reqwrit which don't have time for.
 parseInner :: String -> Int -> Int -> [Bracket] -> ([Bracket] -> Bracket) -> Maybe (Bracket, Int)
 parseInner [] _ _ _ _ = Nothing -- this line ande the final line are the issues -- think fixed
 parseInner xs depthRound depthCurly brackets constructor
