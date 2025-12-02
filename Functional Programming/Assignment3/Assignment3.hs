@@ -18,6 +18,7 @@ import Data.List
 
 {- Question 1 -}
 
+
 toRose :: Free [] a -> Rose a 
 toRose (Pure x) = Lf x
 toRose (Free f) = Br (map toRose f)
@@ -27,6 +28,10 @@ fromRose (Lf x) = Pure x
 fromRose (Br []) = Free []
 fromRose (Br (Lf x:xs)) = Free (Pure x : [fromRose y| y <- xs]) -- apparently don't need the (Lf x):xs accorrding to vs code syntax thats fun
 fromRose (Br (Br x:xs)) = Free (map fromRose (Br x:xs))
+
+-- for testing
+exampleRose :: Rose Int
+exampleRose = Br [Lf 1, Br [Lf 2, Lf 3], Lf 4]
 
 {- Question 2 -}
 
