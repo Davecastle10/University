@@ -168,7 +168,7 @@ yield :: YieldState s ()
 yield = liftF $ FRight (Yield ())
 ```
 
-Here is an example:
+Here is an example of what such a computation looks like:
 
 ```hs
 yieldEx :: YieldState Int ()
@@ -194,6 +194,33 @@ which takes a list of these possibly yielding stateful computations, and schedul
 1. When a compution finishes with a `Pure` that process is removed from the list.
 1. The first computation on the list runs until it encounters a `yield`, at which point it is moved to 
    the back and computation continues with the next process in the list.
+
+For an example, consider the following "thread":
+
+```hs
+charWriter :: Char -> YieldState String ()
+charWriter c = do s <- getY
+                  if (length s > 10) then pure () else
+                    do putY (c:s)
+                       yield
+                       charWriter c 
+```
+
+Each time the thread wakes up, it reads the current state, and if the length of the string is greater than `10`, exits.  Otherwise, it writes its own specified character to the front of the current string, yields, and then starts over again.
+
+If we create a list of these, each with a different character as so:
+
+```hs
+yieldExample :: [YieldState String ()]
+yieldExample = [charWriter 'a', charWriter 'b', charWriter 'c'] 
+```
+
+We should get the following:
+
+```
+ghci> execState (roundRobin yieldExample) "" 
+"bacbacbacba"
+```
 
 # Stateful Computations which can Sleep 
 
@@ -236,10 +263,47 @@ obey the following rules
 
 1. Each of the provided threads will keep a "sleep counter"
 1. When all programs are sleeping, the scheduler advances time by one step, decrementing the sleep counters of all the threads
-1. Otherwise, the scheduler should select the first thread in the list whose sleep counter is at 0 and run this thread.
+1. Otherwise, the scheduler should select the first thread in the list whose sleep counter is at 0 and run this thread.  (**Note** This means that the threads should be kept in a fixed order, unlike the Round-Robin scheduler, and the first thread in the list has the highest priority).
 1. The thread the continues running, decrementing the *other* threads' sleep counters with each step, until the thread itself sleeps or exits.
 1. When the active thread sleeps its sleep counter is set to the specified value (which you may assume is always a positive integer), we recalculate the next thread to run as above
 1. Threads which exit are removed from the list 
 1. When the list of running threads is empty, the computation returns
 1. Note that each instruction in the `State` monad counts as a single step, but `Sleep` instructions themselves do not.
 
+For example, consider the following three "threads" (these are available in the `Type.hs` file) 
+
+```hs
+appendChar :: Char -> SleepState String ()
+appendChar c = do
+  s <- getZ
+  putZ (s ++ [c])
+
+sleepThread1 :: SleepState String ()
+sleepThread1 = do
+  appendChar 'a' -- 2 steps
+  appendChar 'a' -- 2 steps
+  sleep 4
+  appendChar 'a' -- 2 steps
+
+sleepThread2 :: SleepState String ()
+sleepThread2 = do
+  sleep 2
+  appendChar 'b' -- 2 steps
+  appendChar 'b' -- 2 steps
+
+sleepThread3 :: SleepState String ()
+sleepThread3 = do
+  appendChar 'c' -- 2 steps
+  sleep 2
+  appendChar 'c' -- 2 steps
+  
+sleepExample :: [SleepState String ()]
+sleepExample = [sleepThread1, sleepThread2, sleepThread3]
+```
+
+Running your scheduler should produce the following:
+
+```
+ghci> execState (schedule sleepExample) ""
+"aacbbac"
+```

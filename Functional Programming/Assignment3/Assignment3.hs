@@ -18,7 +18,6 @@ import Data.List
 
 {- Question 1 -}
 
-
 toRose :: Free [] a -> Rose a 
 toRose (Pure x) = Lf x
 toRose (Free f) = Br (map toRose f)
@@ -36,7 +35,9 @@ exampleRose = Br [Lf 1, Br [Lf 2, Lf 3], Lf 4]
 {- Question 2 -}
 
 trace :: FreeState s a -> State ([s],s) a
-trace = undefined
+trace fs = undefined
+    where 
+        ufs = unfree fs -- unfree FreeState to get just the state but s is alread a name for this so a using ufs -- kinda sounds like one of thos tv figth show names
 
 {- Question 3 -}
 
