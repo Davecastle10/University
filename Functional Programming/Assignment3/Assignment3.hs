@@ -35,9 +35,24 @@ exampleRose = Br [Lf 1, Br [Lf 2, Lf 3], Lf 4]
 {- Question 2 -}
 
 trace :: FreeState s a -> State ([s],s) a
-trace fs = undefined
+trace fs = unfree ufsTraced
     where 
         ufs = unfree fs -- unfree FreeState to get just the state but s is alread a name for this so a using ufs -- kinda sounds like one of thos tv figth show names
+        ufsTraced = do
+            cState <- getF    -- current state
+            saveState cState -- save the current state with staveState helper func 
+
+            case ufs of
+                Pure val -> return val -- if the resulting value of the unwrapped FreeState is a Pure value return it
+                Free 
+            
+
+
+
+        -- helpies are great
+        saveState state = do -- function to save the state to a list like needed
+        modify (\(states, current) -> (state : states, current)) -- save the state to a list
+
 
 {- Question 3 -}
 
