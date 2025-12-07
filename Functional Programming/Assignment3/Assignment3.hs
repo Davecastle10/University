@@ -44,14 +44,16 @@ trace fs = unfree ufsTraced
 
             case ufs of
                 Pure val -> return val -- if the resulting value of the unwrapped FreeState is a Pure value return it
-                Free 
+                Free stuff -> do -- need to do more stuff to handle when it is a Free thing , moands are confusing
+
+
             
 
 
 
         -- helpies are great
         saveState state = do -- function to save the state to a list like needed
-        modify (\(states, current) -> (state : states, current)) -- save the state to a list
+            modify (\(states, current) -> (state : states, current)) -- save the state to a list, feel like i should also say that it puts it in the structure of the return type in the function declaration cause otherwise i will forget by the morning and then have to spend ages undersradning what 3am me did again.
 
 
 {- Question 3 -}
