@@ -34,9 +34,11 @@ exampleRose = Br [Lf 1, Br [Lf 2, Lf 3], Lf 4]
 
 {- Question 2 -}
 
+
 trace :: FreeState s a -> State ([s],s) a
-trace fs = unfree ufsTraced
-    where 
+trace Pure x = return x
+trace Free m = unfree ufsTraced
+    where
         ufs = unfree fs -- unfree FreeState to get just the state but s is alread a name for this so a using ufs -- kinda sounds like one of thos tv figth show names
         ufsTraced = do
             cState <- getF    -- current state
@@ -45,7 +47,7 @@ trace fs = unfree ufsTraced
             case ufs of
                 Pure val -> return val -- if the resulting value of the unwrapped FreeState is a Pure value return it
                 Free stuff -> do -- need to do more stuff to handle when it is a Free thing , moands are confusing
-
+                                 -- might end up changin pproach later as this is not fun to get working.
 
             
 
@@ -54,6 +56,8 @@ trace fs = unfree ufsTraced
         -- helpies are great
         saveState state = do -- function to save the state to a list like needed
             modify (\(states, current) -> (state : states, current)) -- save the state to a list, feel like i should also say that it puts it in the structure of the return type in the function declaration cause otherwise i will forget by the morning and then have to spend ages undersradning what 3am me did again.
+
+
 
 
 {- Question 3 -}
