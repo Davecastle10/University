@@ -63,21 +63,50 @@ trace (Free fs) = do
                 Free stuff -> do -- need to do more stuff to handle when it is a Free thing , moands are confusing
                                  -- might end up changin pproach later as this is not fun to get working.
 
-            
-
-
-
         -- helpies are great
         saveState state = do -- function to save the state to a list like needed
             modify (\(states, current) -> (state : states, current)) -- save the state to a list, feel like i should also say that it puts it in the structure of the return type in the function declaration cause otherwise i will forget by the morning and then have to spend ages undersradning what 3am me did again.
-
 -}
 
 
 {- Question 3 -}
 
+-- data FSum f g a = FLeft (f a) | FRight (g a)
+-- type YieldState s a = Free (FSum (State s) Yield) a 
+{-}
+getY :: YieldState s s
+getY = liftF $ FLeft get
+
+putY :: s -> YieldState s ()
+putY s = liftF $ FLeft (put s)
+
+yield :: YieldState s ()
+yield = liftF $ FRight (Yield ())
+
+yieldEx :: YieldState Int ()
+yieldEx = do
+  i <- getY
+  yield
+  putY $ i + 1
+  pure ()
+-}
+
+-- think need to use more of the given functions and stuff, could be much better, but think can make work without a full rewrite
 roundRobin :: [YieldState s ()] -> State s ()
-roundRobin = undefined
+roundRobin [] = return () -- return when empty list
+roundRobin (x:xs) = do 
+    y <- getY x
+    -- result <- unfree x  
+    case y of
+        Pure val -> roundRobin xs
+        Free (FLeft fa) -> do
+            cState <- get
+            (a, nState) <- runState fa cState
+            put nState 
+            roundRobin (xs:x) -- put x to reaer of lsit
+        Free (FRight (Yield _)) -> roundRobin (xs:x) -- put x to reaer of lsit -- should i use the yield function?
+
+-- is probably going to return an incorrect type aswell, but just want to be able to return something would be nice
 
 {- Question 4 -}
 
