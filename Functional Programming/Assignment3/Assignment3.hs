@@ -178,12 +178,18 @@ schedule ((Free (FLeft fa)):xs) = do
         schedule (g:xs)
 
 schedule ((Free (FRight (Sleep 0 g))):xs) = do -- this is wrong atm, but just wanted a general baseline to get near and then fix
-        schedule (xs ++ [g])  
+        schedule (xs ++ [g])  -- need to add some kind of logic allowing for the list to split and other parts to be evaluated?
+        -- either that or figeur out a differnt recursive call that maintains list position and keeps correct execution order
 
 schedule ((Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
         let decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h))
             decrementSleep x = x
         schedule (map decrementSleep (Free (FRight (Sleep n g)):xs))
+
+-- prints out "aacabbc"
+-- when execState (schedule sleepExample) "" is run
+-- but should print "aacbbac"
+
 
 {-
 roundRobin :: [YieldState s ()] -> State s ()
