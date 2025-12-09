@@ -97,7 +97,7 @@ roundRobin [] = return () -- return when empty list
 roundRobin ((Pure x):xs) = roundRobin xs
 roundRobin ((Free (FLeft fa)):xs) = do
             g <- fa
-            roundRobin (xs ++ [g])
+            roundRobin ([g] ++ xs)
 roundRobin ((Free (FRight (Yield g))):xs) = do -- roundRobin (xs:g)
     roundRobin(xs ++ [g])
 {-}
