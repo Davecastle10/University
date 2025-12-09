@@ -10,7 +10,7 @@ module Assignment3 (toRose, fromRose, trace, roundRobin, schedule) where
 import Types
 import Control.Monad.State
 import Data.Functor.Identity
-import Data.List 
+import Data.List
 
 ---------------------------------------------------------------------------------
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
@@ -18,7 +18,7 @@ import Data.List
 
 {- Question 1 -}
 
-toRose :: Free [] a -> Rose a 
+toRose :: Free [] a -> Rose a
 toRose (Pure x) = Lf x
 toRose (Free f) = Br (map toRose f)
 
@@ -97,9 +97,9 @@ roundRobin [] = return () -- return when empty list
 roundRobin ((Pure x):xs) = roundRobin xs
 roundRobin ((Free (FLeft fa)):xs) = do
             g <- fa
-            roundRobin ([g] ++ xs)
+            roundRobin (g:xs)
 roundRobin ((Free (FRight (Yield g))):xs) = do -- roundRobin (xs:g)
-    roundRobin(xs ++ [g])
+    roundRobin (xs ++ [g])
 {-}
 roundRobin (x:xs) = do 
     y <- x
@@ -129,28 +129,71 @@ charWriter c = do s <- getY
                   if (length s > 10) then pure () else
                     do putY (c:s)
                        yield
-                       charWriter c 
+                       charWriter c
 
 yieldExample :: [YieldState String ()]
-yieldExample = [charWriter 'a', charWriter 'b', charWriter 'c'] 
+yieldExample = [charWriter 'a', charWriter 'b', charWriter 'c']
 
--- is probably going to return an incorrect type aswell, but just want to be able to return something would be nice
-{- from task2
-trace (Free fs) = do
-    (states, cState) <- get -- get states
-    let (nFree, nState) =  runState fs cState -- run the state stuff so cando next bit with the next Free monad and the next State
-    put (nState : states, nState) -- collect the states into the otuput list of step staets putting th next state at the front (i tried with current state but then you get tqo (0,1) and no (5,8) in the list) and the final/next state like saveState form attempt 1 but better as the second part of the tuple
-
-    case nFree of
-        Pure val -> return val -- I hate the silly auto fill (is it auto fill or auto complete, not sure what the diffenrce is but its anoying) thingy always changes values like x to xargs, now i remeber why i used val last nigth so it doesnt mess around liek this
-        Free ifs -> do -- where we actually do the funky recursion bit
-            trace $ Free ifs
--}
 
 
 
 
 {- Question 4 -}
+{-
+data FSum f g a = FLeft (f a) | FRight (g a)
+  deriving Show
+  
+deriving instance (Functor f, Functor g) => Functor (FSum f g)
+data Sleep a = Sleep Int a
+  deriving Functor
+
+type SleepState s a = Free (FSum (State s) Sleep) a 
+                       
+getZ :: SleepState s s
+getZ = liftF $ FLeft get
+
+putZ :: s -> SleepState s ()
+putZ s = liftF $ FLeft (put s)
+
+sleep :: Int -> SleepState s ()
+sleep tm = liftF $ FRight (Sleep tm ())
+-}
+
+{- attempt at sleep decrementing but couldn't get it to match properly
+sleepDecrement :: SleepState s ()
+sleepDecrement = undefined
+    where
+        cSleep :: Int
+        cSleep = FSum a b c <<= (unfree (liftF $ FRight get))
+-}
+
+-- schedule as re write of round robin
+-- need to go through and make it actually obey all the scheduling rules, but it seemed easier to base it off this to start 
 
 schedule :: [SleepState s ()] -> State s ()
-schedule = undefined
+schedule [] = return () -- return when empty list
+schedule ((Pure _):xs) = schedule xs
+schedule ((Free (FLeft fa)):xs) = do
+        g <- fa
+        schedule (g:xs)
+
+schedule ((Free (FRight (Sleep 0 g))):xs) = do -- this is wrong atm, but just wanted a general baseline to get near and then fix
+        schedule (xs ++ [g])  
+
+schedule ((Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
+        let decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h))
+            decrementSleep x = x
+        schedule (map decrementSleep (Free (FRight (Sleep n g)):xs))
+
+{-
+roundRobin :: [YieldState s ()] -> State s ()
+roundRobin [] = return () -- return when empty list
+roundRobin ((Pure x):xs) = roundRobin xs
+roundRobin ((Free (FLeft fa)):xs) = do
+            g <- fa
+            roundRobin ([g] ++ xs)
+roundRobin ((Free (FRight (Yield g))):xs) = do -- roundRobin (xs:g)
+    roundRobin(xs ++ [g])
+-}
+
+
