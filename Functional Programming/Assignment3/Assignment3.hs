@@ -94,19 +94,61 @@ yieldEx = do
 -- think need to use more of the given functions and stuff, could be much better, but think can make work without a full rewrite
 roundRobin :: [YieldState s ()] -> State s ()
 roundRobin [] = return () -- return when empty list
+roundRobin ((Pure x):xs) = roundRobin xs
+roundRobin ((Free (FLeft fa)):xs) = do
+            g <- fa
+            roundRobin (xs ++ [g])
+roundRobin ((Free (FRight (Yield g))):xs) = do -- roundRobin (xs:g)
+    roundRobin(xs ++ [g])
+{-}
 roundRobin (x:xs) = do 
-    y <- getY x
+    y <- x
     -- result <- unfree x  
     case y of
         Pure val -> roundRobin xs
         Free (FLeft fa) -> do
-            cState <- get
-            (a, nState) <- runState fa cState
-            put nState 
-            roundRobin (xs:x) -- put x to reaer of lsit
-        Free (FRight (Yield _)) -> roundRobin (xs:x) -- put x to reaer of lsit -- should i use the yield function?
+            g <- fa
+            roundRobin (xs ++ [g])
+            {-do
+            --cState <- get fa -- current state i think
+            --let (nState, rw) = runState fa cState -- to get the next state
+            --returnThings <- putY nState 
+            fState <- fa
+            roundRobin (xs) -- call roundRobin on rest of list after it has finijhsed executing current stufff
+            -}
+        Free (FRight (Yield g)) -> roundRobin (xs ++ [g]) -- -> roundRobin (xs ++ [g]) -- put x to reaer of lsit -- should i use the yield function?
+-}
+-- figure out inputs and stuff
+-- figure out how binds and stuff work
+-- figure out what inputs should be bound to
+
+
+
+charWriter :: Char -> YieldState String ()
+charWriter c = do s <- getY
+                  if (length s > 10) then pure () else
+                    do putY (c:s)
+                       yield
+                       charWriter c 
+
+yieldExample :: [YieldState String ()]
+yieldExample = [charWriter 'a', charWriter 'b', charWriter 'c'] 
 
 -- is probably going to return an incorrect type aswell, but just want to be able to return something would be nice
+{- from task2
+trace (Free fs) = do
+    (states, cState) <- get -- get states
+    let (nFree, nState) =  runState fs cState -- run the state stuff so cando next bit with the next Free monad and the next State
+    put (nState : states, nState) -- collect the states into the otuput list of step staets putting th next state at the front (i tried with current state but then you get tqo (0,1) and no (5,8) in the list) and the final/next state like saveState form attempt 1 but better as the second part of the tuple
+
+    case nFree of
+        Pure val -> return val -- I hate the silly auto fill (is it auto fill or auto complete, not sure what the diffenrce is but its anoying) thingy always changes values like x to xargs, now i remeber why i used val last nigth so it doesnt mess around liek this
+        Free ifs -> do -- where we actually do the funky recursion bit
+            trace $ Free ifs
+-}
+
+
+
 
 {- Question 4 -}
 
