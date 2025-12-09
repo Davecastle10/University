@@ -126,7 +126,7 @@ roundRobin (x:xs) = do
 
 charWriter :: Char -> YieldState String ()
 charWriter c = do s <- getY
-                  if (length s > 10) then pure () else
+                  if length s > 10 then pure () else
                     do putY (c:s)
                        yield
                        charWriter c
@@ -175,16 +175,68 @@ schedule [] = return () -- return when empty list
 schedule ((Pure _):xs) = schedule xs
 schedule ((Free (FLeft fa)):xs) = do
         g <- fa
+        let xs' = map decrementSleep xs
         schedule (g:xs)
 
 schedule ((Free (FRight (Sleep 0 g))):xs) = do -- this is wrong atm, but just wanted a general baseline to get near and then fix
-        schedule (xs ++ [g])  -- need to add some kind of logic allowing for the list to split and other parts to be evaluated?
+        schedule (g:xs)
+        -- schedule (xs ++ [g])  -- need to add some kind of logic allowing for the list to split and other parts to be evaluated?
         -- either that or figeur out a differnt recursive call that maintains list position and keeps correct execution order
 
-schedule ((Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
-        let decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h))
-            decrementSleep x = x
-        schedule (map decrementSleep (Free (FRight (Sleep n g)):xs))
+{-}
+schedule (x@(Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
+        let ret = x : notSleeping xs
+        schedule (map decrementSleep ret)
+-}
+schedule xs =
+    case nextRunnable xs of
+        Nothing -> do schedule (map decrementSleep xs) -- decrement sleeps for everything
+        Just (sleepingBefore, runnable, after) ->
+            case runnable of
+                Free (FLeft fa) -> do
+                    g <- fa
+                    let others = map decrementSleep (sleepingBefore ++ after)
+                    schedule (map decrementSleep sleepingBefore ++ [g] ++ map decrementSleep after)
+                
+                Free (FRight (Sleep 0 g)) ->
+                    schedule (g : (sleepingBefore ++ after))
+                
+                _  -> error "Propaganda, this is Propaganda for THE ORB" -- i really hoep this doesnt actually run, cause errors are annoying
+-- need helper function that when encountering sleeping function at star of list goes through list till non sleeping function found
+-- executes non sleeping function then returns it's value back up
+-- decrements sleep for all things
+
+-- that didn't work beacus need to return state not list of sleep state for helper
+-- so instead try splitting list into things sleeping before the next runnable sleepState and the things after
+-- then run the runnable sleep state in schedule
+-- decrement sleep for all threads  and schedule the things before : ran state : things after 
+
+nextRunnable :: [SleepState s ()] -> Maybe ([SleepState s ()], SleepState s (), [SleepState s ()])
+nextRunnable = splitThreads []
+    where
+        splitThreads sleepingBefore [] = Nothing  -- no runnable thread found
+        splitThreads sleepingBefore (x:xs) =
+            case x of
+                Pure _ -> splitThreads sleepingBefore xs 
+                Free (FLeft fa) -> Just (sleepingBefore, x, xs)  
+                Free (FRight (Sleep 0 g@(Free (FLeft fa)))) -> Just (sleepingBefore, x, xs)
+                Free (FRight (Sleep n g)) -> splitThreads (sleepingBefore ++ [x]) xs 
+
+
+{-}
+notSleeping :: [SleepState s ()] -> [SleepState s ()]
+notSleeping [] = [] -- return when empty list
+notSleeping ((Pure _):xs) =  xs
+notSleeping ((Free (FLeft fa)):xs) = do
+        g <- fa
+        return g ++ xs
+notSleeping ((Free (FRight (Sleep 0 g))):xs) = g : xs -- thik this looks nicer with the space when not
+notSleeping (x@(Free (FRight (Sleep n g))):xs) = x : notSleeping xs
+-}
+
+decrementSleep :: SleepState s () -> SleepState s ()
+decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h))
+decrementSleep x = x
 
 -- prints out "aacabbc"
 -- when execState (schedule sleepExample) "" is run
