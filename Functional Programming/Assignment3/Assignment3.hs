@@ -182,7 +182,6 @@ schedule ((Free (FRight (Sleep 0 g))):xs) = do -- this is wrong atm, but just wa
         schedule (g:xs)
         -- schedule (xs ++ [g])  -- need to add some kind of logic allowing for the list to split and other parts to be evaluated?
         -- either that or figeur out a differnt recursive call that maintains list position and keeps correct execution order
-
 {-}
 schedule (x@(Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
         let ret = x : notSleeping xs
@@ -198,8 +197,7 @@ schedule xs =
                     let others = map decrementSleep (sleepingBefore ++ after)
                     schedule (map decrementSleep sleepingBefore ++ [g] ++ map decrementSleep after)
                 
-                Free (FRight (Sleep 0 g)) ->
-                    schedule (g : (sleepingBefore ++ after))
+                Free (FRight (Sleep 0 g)) -> schedule (g : (sleepingBefore ++ after))
                 
                 _  -> error "Propaganda, this is Propaganda for THE ORB" -- i really hoep this doesnt actually run, cause errors are annoying
 -- need helper function that when encountering sleeping function at star of list goes through list till non sleeping function found
@@ -217,10 +215,10 @@ nextRunnable = splitThreads []
         splitThreads sleepingBefore [] = Nothing  -- no runnable thread found
         splitThreads sleepingBefore (x:xs) =
             case x of
-                Pure _ -> splitThreads sleepingBefore xs 
-                Free (FLeft fa) -> Just (sleepingBefore, x, xs)  
-                Free (FRight (Sleep 0 g@(Free (FLeft fa)))) -> Just (sleepingBefore, x, xs)
-                Free (FRight (Sleep n g)) -> splitThreads (sleepingBefore ++ [x]) xs 
+                Pure _ -> splitThreads sleepingBefore xs -- remove pure stuff as the thread has finished its comppute
+                Free (FLeft fa) -> Just (sleepingBefore, x, xs)  -- pass back this val in middle so it gets run next
+                Free (FRight (Sleep 0 g@(Free (FLeft fa)))) -> Just (sleepingBefore, x, xs) -- pass back this val so it is taken out of sleep nd run next
+                Free (FRight (Sleep n g)) -> splitThreads (sleepingBefore ++ [x]) xs -- call again on next part of list
 
 
 {-}
