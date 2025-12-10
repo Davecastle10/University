@@ -41,7 +41,6 @@ trace (Free fs) = do
     (states, cState) <- get -- get states
     let (nFree, nState) =  runState fs cState -- run the state stuff so cando next bit with the next Free monad and the next State
     put (nState : states, nState) -- collect the states into the otuput list of step staets putting th next state at the front (i tried with current state but then you get tqo (0,1) and no (5,8) in the list) and the final/next state like saveState form attempt 1 but better as the second part of the tuple
-
     case nFree of
         Pure val -> return val -- I hate the silly auto fill (is it auto fill or auto complete, not sure what the diffenrce is but its anoying) thingy always changes values like x to xargs, now i remeber why i used val last nigth so it doesnt mess around liek this
         Free ifs -> do -- where we actually do the funky recursion bit
@@ -71,26 +70,6 @@ trace (Free fs) = do
 
 {- Question 3 -}
 
--- data FSum f g a = FLeft (f a) | FRight (g a)
--- type YieldState s a = Free (FSum (State s) Yield) a 
-{-}
-getY :: YieldState s s
-getY = liftF $ FLeft get
-
-putY :: s -> YieldState s ()
-putY s = liftF $ FLeft (put s)
-
-yield :: YieldState s ()
-yield = liftF $ FRight (Yield ())
-
-yieldEx :: YieldState Int ()
-yieldEx = do
-  i <- getY
-  yield
-  putY $ i + 1
-  pure ()
--}
-
 -- think need to use more of the given functions and stuff, could be much better, but think can make work without a full rewrite
 roundRobin :: [YieldState s ()] -> State s ()
 roundRobin [] = return () -- return when empty list
@@ -110,7 +89,7 @@ roundRobin (x:xs) = do
             g <- fa
             roundRobin (xs ++ [g])
             {-do
-            --cState <- get fa -- current state i think
+            --cState <- get fa -- current state 
             --let (nState, rw) = runState fa cState -- to get the next state
             --returnThings <- putY nState 
             fState <- fa
@@ -139,54 +118,23 @@ yieldExample = [charWriter 'a', charWriter 'b', charWriter 'c']
 
 
 {- Question 4 -}
-{-
-data FSum f g a = FLeft (f a) | FRight (g a)
-  deriving Show
-  
-deriving instance (Functor f, Functor g) => Functor (FSum f g)
-data Sleep a = Sleep Int a
-  deriving Functor
 
-type SleepState s a = Free (FSum (State s) Sleep) a 
-                       
-getZ :: SleepState s s
-getZ = liftF $ FLeft get
 
-putZ :: s -> SleepState s ()
-putZ s = liftF $ FLeft (put s)
-
-sleep :: Int -> SleepState s ()
-sleep tm = liftF $ FRight (Sleep tm ())
--}
-
-{- attempt at sleep decrementing but couldn't get it to match properly
-sleepDecrement :: SleepState s ()
-sleepDecrement = undefined
-    where
-        cSleep :: Int
-        cSleep = FSum a b c <<= (unfree (liftF $ FRight get))
--}
 
 -- schedule as re write of round robin
 -- need to go through and make it actually obey all the scheduling rules, but it seemed easier to base it off this to start 
 
 schedule :: [SleepState s ()] -> State s ()
 schedule [] = return () -- return when empty list
-schedule ((Pure _):xs) = schedule xs
+schedule ((Pure _):xs) = schedule xs -- when Pure call schedule on rest of list as this no longer needed
 schedule ((Free (FLeft fa)):xs) = do
         g <- fa
         let xs' = map decrementSleep xs
         schedule (g:xs)
-
 schedule ((Free (FRight (Sleep 0 g))):xs) = do -- this is wrong atm, but just wanted a general baseline to get near and then fix
         schedule (g:xs)
         -- schedule (xs ++ [g])  -- need to add some kind of logic allowing for the list to split and other parts to be evaluated?
         -- either that or figeur out a differnt recursive call that maintains list position and keeps correct execution order
-{-}
-schedule (x@(Free (FRight (Sleep n g))):xs) = do -- Decrement sleep counter for sleeping threads
-        let ret = x : notSleeping xs
-        schedule (map decrementSleep ret)
--}
 schedule xs =
     case nextRunnable xs of
         Nothing -> do schedule (map decrementSleep xs) -- decrement sleeps for everything
@@ -196,9 +144,7 @@ schedule xs =
                     g <- fa
                     let others = map decrementSleep (sleepingBefore ++ after)
                     schedule (map decrementSleep sleepingBefore ++ [g] ++ map decrementSleep after)
-                
                 Free (FRight (Sleep 0 g)) -> schedule (g : (sleepingBefore ++ after))
-                
                 _  -> error "Propaganda, this is Propaganda for THE ORB" -- i really hoep this doesnt actually run, cause errors are annoying
 -- need helper function that when encountering sleeping function at star of list goes through list till non sleeping function found
 -- executes non sleeping function then returns it's value back up
@@ -210,46 +156,34 @@ schedule xs =
 -- decrement sleep for all threads  and schedule the things before : ran state : things after 
 
 nextRunnable :: [SleepState s ()] -> Maybe ([SleepState s ()], SleepState s (), [SleepState s ()])
-nextRunnable = splitThreads []
+nextRunnable threadsIn = splitThreads [] threadsIn
+{-}
     where
         splitThreads sleepingBefore [] = Nothing  -- no runnable thread found
-        splitThreads sleepingBefore (x:xs) =
-            case x of
-                Pure _ -> splitThreads sleepingBefore xs -- remove pure stuff as the thread has finished its comppute
-                Free (FLeft fa) -> Just (sleepingBefore, x, xs)  -- pass back this val in middle so it gets run next
-                Free (FRight (Sleep 0 g@(Free (FLeft fa)))) -> Just (sleepingBefore, x, xs) -- pass back this val so it is taken out of sleep nd run next
-                Free (FRight (Sleep n g)) -> splitThreads (sleepingBefore ++ [x]) xs -- call again on next part of list
-
-
-{-}
-notSleeping :: [SleepState s ()] -> [SleepState s ()]
-notSleeping [] = [] -- return when empty list
-notSleeping ((Pure _):xs) =  xs
-notSleeping ((Free (FLeft fa)):xs) = do
-        g <- fa
-        return g ++ xs
-notSleeping ((Free (FRight (Sleep 0 g))):xs) = g : xs -- thik this looks nicer with the space when not
-notSleeping (x@(Free (FRight (Sleep n g))):xs) = x : notSleeping xs
+        splitThreads sleepingBefore (Pure _ :xs) = splitThreads sleepingBefore xs -- remove pure stuff as the thread has finished its comppute and call again
+        splitThreads sleepingBefore (x@(Free (FLeft fa)):xs) = Just (sleepingBefore, x, xs) -- pass back this val in middle so it gets run next
+        splitThreads sleepingBefore (x@(Free (FRight (Sleep 0 g))):xs) = Just (sleepingBefore, x, xs) -- pass back this val so it is taken out of sleep nd run next
+        splitThreads sleepingBefore (x@(Free (FRight (Sleep n g))):xs) =  splitThreads (sleepingBefore ++ [x]) xs -- call again on next part of list
 -}
 
+-- I could proabbly just replace nexr runnable by calling split threads directly or even just rename split threads to next Runnable?
+-- nah, this makes it slighly easier to deal with the inial empty list to the right
+-- can't decide if i prefer it split like this or as a sub helper function thingy
+
+splitThreads :: [SleepState s ()] -> [SleepState s ()] -> Maybe ([SleepState s ()], SleepState s (), [SleepState s ()])
+splitThreads sleepingBefore [] = Nothing  -- no runnable thread found
+splitThreads sleepingBefore (Pure _ :xs) = splitThreads sleepingBefore xs -- remove pure stuff as the thread has finished its comppute and call again
+splitThreads sleepingBefore (x@(Free (FLeft fa)):xs) = Just (sleepingBefore, x, xs) -- pass back this val in middle so it gets run next
+splitThreads sleepingBefore (x@(Free (FRight (Sleep 0 g))):xs) = Just (sleepingBefore, x, xs) -- pass back this val so it is taken out of sleep nd run next
+splitThreads sleepingBefore (x@(Free (FRight (Sleep n g))):xs) =  splitThreads (sleepingBefore ++ [x]) xs -- call again on next part of list
+
 decrementSleep :: SleepState s () -> SleepState s ()
-decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h))
-decrementSleep x = x
+decrementSleep (Free (FRight (Sleep m h))) = Free (FRight (Sleep (max 0 (m-1)) h)) -- sleepy so make less sleepy
+decrementSleep x = x -- not sleepy so just return as is
 
 -- prints out "aacabbc"
 -- when execState (schedule sleepExample) "" is run
 -- but should print "aacbbac"
-
-
-{-
-roundRobin :: [YieldState s ()] -> State s ()
-roundRobin [] = return () -- return when empty list
-roundRobin ((Pure x):xs) = roundRobin xs
-roundRobin ((Free (FLeft fa)):xs) = do
-            g <- fa
-            roundRobin ([g] ++ xs)
-roundRobin ((Free (FRight (Yield g))):xs) = do -- roundRobin (xs:g)
-    roundRobin(xs ++ [g])
--}
+-- now prints out "aacbbac" as it should do.
 
 
