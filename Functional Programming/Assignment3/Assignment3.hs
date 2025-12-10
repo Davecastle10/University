@@ -16,6 +16,8 @@ import Data.List
 ---------------- DO **NOT** MAKE ANY CHANGES ABOVE THIS LINE --------------------
 ---------------------------------------------------------------------------------
 
+-- Finally submitted, that was a pain
+
 {- Question 1 -}
 
 toRose :: Free [] a -> Rose a
