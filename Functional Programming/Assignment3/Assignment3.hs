@@ -19,8 +19,8 @@ import Data.List
 {- Question 1 -}
 
 toRose :: Free [] a -> Rose a
-toRose (Pure x) = Lf x
-toRose (Free f) = Br (map toRose f)
+toRose (Pure x) = Lf x -- recursive base case
+toRose (Free f) = Br (map toRose f) -- recursive case
 
 fromRose :: Rose a -> Free [] a
 fromRose (Lf x) = Pure x -- recursive base cases
@@ -47,25 +47,6 @@ trace (Free fs) = do
             trace $ Free ifs
 
 -- it was worth spending like 3 hours thsi morning going over thoses lecture notes agin.
-
-
--- bannish this code to the shadow realm
-{-}
-    where
-        ufs = unfree fs -- unfree FreeState to get just the state but s is alread a name for this so a using ufs -- kinda sounds like one of thos tv figth show names
-        ufsTraced = do
-            cState <- getF    -- current state
-            saveState cState -- save the current state with staveState helper func 
-
-            case ufs of
-                Pure val -> return val -- if the resulting value of the unwrapped FreeState is a Pure value return it
-                Free stuff -> do -- need to do more stuff to handle when it is a Free thing , moands are confusing
-                                 -- might end up changin pproach later as this is not fun to get working.
-
-        -- helpies are great
-        saveState state = do -- function to save the state to a list like needed
-            modify (\(states, current) -> (state : states, current)) -- save the state to a list, feel like i should also say that it puts it in the structure of the return type in the function declaration cause otherwise i will forget by the morning and then have to spend ages undersradning what 3am me did again.
--}
 
 
 {- Question 3 -}
@@ -157,14 +138,6 @@ schedule xs =
 
 nextRunnable :: [SleepState s ()] -> Maybe ([SleepState s ()], SleepState s (), [SleepState s ()])
 nextRunnable threadsIn = splitThreads [] threadsIn
-{-}
-    where
-        splitThreads sleepingBefore [] = Nothing  -- no runnable thread found
-        splitThreads sleepingBefore (Pure _ :xs) = splitThreads sleepingBefore xs -- remove pure stuff as the thread has finished its comppute and call again
-        splitThreads sleepingBefore (x@(Free (FLeft fa)):xs) = Just (sleepingBefore, x, xs) -- pass back this val in middle so it gets run next
-        splitThreads sleepingBefore (x@(Free (FRight (Sleep 0 g))):xs) = Just (sleepingBefore, x, xs) -- pass back this val so it is taken out of sleep nd run next
-        splitThreads sleepingBefore (x@(Free (FRight (Sleep n g))):xs) =  splitThreads (sleepingBefore ++ [x]) xs -- call again on next part of list
--}
 
 -- I could proabbly just replace nexr runnable by calling split threads directly or even just rename split threads to next Runnable?
 -- nah, this makes it slighly easier to deal with the inial empty list to the right
